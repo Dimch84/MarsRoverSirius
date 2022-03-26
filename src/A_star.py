@@ -1,79 +1,76 @@
 from heapdict import heapdict
+from cell import Cell
+from field import Field
+from edges import Edges
 
-STEPS = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
 INFINITY = 1000
 
-def get_neigbours(field: dict, cell: (int, int)) -> [(int, int)]:
-	"""
-	This method returns all available neigbours of current cell
-	param field: dictionary of cells with blocking information:
-	    '0' - cell is unlock
-	    '1' - cell is lock
-	param cell: current cell
-	"""
-	potential_neighbours = [(delta_x + cell[0], delta_y + cell[1]) 
-		for delta_x, delta_y in STEPS]
-	return filter(lambda cell : cell in field.keys() and field[cell] == '0', potential_neighbours)
-
-def get_unit_edges_costs(field: dict) -> dict:
-	"""
-	This method appoints all edges unit cost
-	param field: dictionary of cells with blocking information:
-	    '0' - cell is unlock
-	    '1' - cell is lock
-	"""
-	
-	edges_cost = dict()
-	for cell in field:
-		for neigbour_cell in get_neigbours(field, cell):
-			edges_cost[(min(cell, neigbour_cell), max(cell, neigbour_cell))] = 1
-	return edges_cost
-
-
-
-class A_star(object):
+class A_star:
 	@staticmethod
-	def get_optimal_path(start: (int, int), 
-		                 goal: (int, int), 
-		                 field: dict,
-		                 edges_cost: dict = None) -> (int, [(int, int)]):
+	def call(start: (int, int),
+		     goal: (int, int),
+		     field: [str],
+		     edges_dict: dict = None) -> (int, [(int, int)]):
+		"""
+		This method calculates path (and his length) from start cell to goal cell with A* algorithm
+		param start: start cell coordinates
+		param goal: goal cell cordinates
+		param field: matrix of cells with information about lock cells:
+			'0' - cell is unlocked
+			'1' - cell is locked
+		param edges_dict: edges dictionary with their cost 
+		"""
+		height, width = len(field), len(field[0])
+		height, width = len(field), len(field[0])
+		field_instance = Field(height, width, field)
+		start_cell = field_instance.get_cell(start)
+		goal_cell = field_instance.get_cell(goal)
+		edges = Edges.set_edges(edges_dict, field_instance)
+		answer, path = A_star.get_optimal_path(start_cell, goal_cell, field_instance, edges)
+		if answer == None:
+			return None, None
+		return answer, [cell.get_cell_coord() for cell in path]
+
+	
+	@staticmethod
+	def get_optimal_path(start: Cell, 
+		                 goal: Cell, 
+		                 field: Field,
+		                 edges: Edges = None) -> (int, [Cell]):
 		"""
 		This method calculates path (and his length) from start cell to goal cell with A* algorithm
 		param start: start cell
 		param goal: goal cell
-		param field: dictionary of cells with blocking information:
-		    '0' - cell is unlock
-		    '1' - cell is lock
-		param edges_cost: dictionary of edges with their cost 
+		param field: given Field instance
+		param edges: given Edges instance
 		"""
 
-		if edges_cost == None: # if edges_cost wasn't passed to method then every edge has unit cost
-			edges_cost = get_unit_edges_costs(field)
-		
+		if edges == None: # if Edges instance wasn't passed to method then every edge has unit cost
+			edges = Edges()
+			edges.appoint_unit_edges_costs(field)
+
 		heuristic_value = dict() # heuristic function from A* algorithm
-		for cell in field:
-			heuristic_value[cell] = max(abs(start[0] - cell[0]), abs(start[1] - cell[1]))
+		for cell in field.get_board():
+			heuristic_value[cell] = field.calculate_heuristic_value(cell, goal)
 
 		priority_queue = heapdict() # priority queue of cells from A* algorithm
 		priority_queue[start] = heuristic_value[start]
 
+		start.distance = 0
 		distance = dict() # distance from start cell to current
-		for cell in field:
+		for cell in field.get_board():
 			distance[cell] = INFINITY
 		distance[start] = 0
 
 		predecessor = dict() # previous cell on the path from the start cell to current
-		for cell in field:
+		for cell in field.get_board():
 			predecessor[cell] = None
 		predecessor[start] = start
 
-		get_edge_cost = (lambda cell_1, cell_2 : edges_cost[(min(cell_1, cell_2), max(cell_1, cell_2))])	
-
 		while len(priority_queue) != 0:
 			current_cell, _ = priority_queue.popitem()
-
-			for next_cell in get_neigbours(field, current_cell):
-				edge_cost = get_edge_cost(current_cell, next_cell)
+		
+			for next_cell, edge_cost in edges.get_neigbours(current_cell):
 				new_distance = distance[current_cell] + edge_cost
 				if new_distance < distance[next_cell]:
 					distance[next_cell] = new_distance
@@ -89,5 +86,6 @@ class A_star(object):
 			path.append(cell_on_the_path)
 			cell_on_the_path = predecessor[cell_on_the_path]
 		path.append(cell_on_the_path)
-		
+
+
 		return (distance[goal], path[::-1])

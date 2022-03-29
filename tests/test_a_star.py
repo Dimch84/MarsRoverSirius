@@ -131,7 +131,7 @@ class Test(unittest.TestCase):
 		              ((2, 0), (2, 1)) : 1,
 		              ((2, 1), (2, 2)) : 3}
 
-		self.assertEqual(A_star.call(start=(0, 0), goal=(2, 2), field=field, edges_dict=edges_dict)[0], 888)
+		self.assertEqual(A_star.call(start=(0, 0), goal=(2, 2), field=field, edges_dict=edges_dict)[0], 8)
 		self.assertEqual(A_star.call(start=(1, 0), goal=(2, 1), field=field, edges_dict=edges_dict)[0], 3)
 		self.assertEqual(A_star.call(start=(1, 0), goal=(1, 2), field=field, edges_dict=edges_dict)[0], 5)
 		self.assertEqual(A_star.call(start=(2, 0), goal=(0, 2), field=field, edges_dict=edges_dict)[0], 4)

@@ -35,42 +35,8 @@ class Map(Frame):
         self.map = [[SquareType.FREE for _ in range(width)]
                     for _ in range(height)]
         self.canvas = Canvas(self)
-        self.add_binds()
+        self.__add_binds()
         self.generate_random()
-
-    def add_binds(self) -> None:
-        """
-        This function adds binds to process user input.
-        :return:
-        """
-        self.canvas.bind('<Button>', self.change_square)
-        self.focus_set()
-        self.bind('<KeyPress>', self.process_key_press)
-        self.bind('<KeyRelease>', self.process_key_release)
-
-    def process_key_press(self, event: Event) -> None:
-        """
-        This function processes a key press event, it should be used in widget.bind.
-        :param event: tkinter event.
-        :return:
-        """
-        key = event.keysym
-        if key == 'Alt_L' or key == 'Alt_R':
-            self.alt_pressed = True
-        elif key == 'Shift_L' or key == 'Shift_R':
-            self.shift_pressed = True
-
-    def process_key_release(self, event: Event) -> None:
-        """
-        This function processes a key release event, it should be used in widget.bind.
-        :param event: tkinter event.
-        :return:
-        """
-        key = event.keysym
-        if key == 'Alt_L' or key == 'Alt_R':
-            self.alt_pressed = False
-        elif key == 'Shift_L' or key == 'Shift_R':
-            self.shift_pressed = False
 
     def generate_random(self) -> None:
         """
@@ -93,22 +59,23 @@ class Map(Frame):
 
     def save(self, file_name: str) -> None:
         """
-        Saves the map to a text file.
+        This method saves the map to a text file.
         :param file_name: output file name.
         :return:
         """
         with open(file_name, 'w') as file:
             for i in range(self.height):
                 for j in range(self.width):
-                    file.write(str(int(self.map[i][j])))
-                    file.write(' ')
+                    file.write(f'{int(self.map[i][j])} ')
                 file.write('\n')
-            file.write(f'{self.start_position[0]} {self.start_position[1]}\n')
-            file.write(f'{self.finish_position[0]} {self.finish_position[1]}\n')
+            file.write(f'{self.start_position[0]} '
+                       f'{self.start_position[1]}\n')
+            file.write(f'{self.finish_position[0]} '
+                       f'{self.finish_position[1]}\n')
 
     def load(self, file_name: str) -> None:
         """
-        Loads the map from a text file.
+        This method loads the map from a text file.
         :param file_name: input file name.
         :return:
         """
@@ -129,10 +96,44 @@ class Map(Frame):
         """
         self.pack(fill=BOTH, expand=1)
         for i, j in product(range(self.height), range(self.width)):
-            self.draw_square(i, j)
+            self.__draw_square(i, j)
         self.canvas.pack(fill=BOTH, expand=1)
 
-    def change_square(self, event: Event) -> None:
+    def __add_binds(self) -> None:
+        """
+        This method adds binds to process user input.
+        :return:
+        """
+        self.canvas.bind('<Button>', self.__change_square)
+        self.focus_set()
+        self.bind('<KeyPress>', self.__process_key_press)
+        self.bind('<KeyRelease>', self.__process_key_release)
+
+    def __process_key_press(self, event: Event) -> None:
+        """
+        This method processes a key press event, it should be used in widget.bind.
+        :param event: tkinter event.
+        :return:
+        """
+        key = event.keysym
+        if key == 'Alt_L' or key == 'Alt_R':
+            self.alt_pressed = True
+        elif key == 'Shift_L' or key == 'Shift_R':
+            self.shift_pressed = True
+
+    def __process_key_release(self, event: Event) -> None:
+        """
+        This method processes a key release event, it should be used in widget.bind.
+        :param event: tkinter event.
+        :return:
+        """
+        key = event.keysym
+        if key == 'Alt_L' or key == 'Alt_R':
+            self.alt_pressed = False
+        elif key == 'Shift_L' or key == 'Shift_R':
+            self.shift_pressed = False
+
+    def __change_square(self, event: Event) -> None:
         """
         This method changes a square on mouse click, it should be used in widget.bind.
         :param event: tkinter event.
@@ -145,15 +146,17 @@ class Map(Frame):
         if col_index < 0 or col_index >= self.width:
             return
         if self.alt_pressed:
-            self.change_special_square(row_index, col_index, SquareType.START)
+            self.__change_special_square(row_index, col_index,
+                                         SquareType.START)
         elif self.shift_pressed:
-            self.change_special_square(row_index, col_index, SquareType.FINISH)
+            self.__change_special_square(row_index, col_index,
+                                         SquareType.FINISH)
         else:
-            self.change_normal_square(row_index, col_index)
+            self.__change_normal_square(row_index, col_index)
 
-    def change_normal_square(self, row_index: int, col_index: int) -> None:
+    def __change_normal_square(self, row_index: int, col_index: int) -> None:
         """
-        This function changes a square from free to blocked and vice versa.
+        This method changes a square from free to blocked and vice versa.
         :param row_index: row index.
         :param col_index: column index.
         :return:
@@ -162,12 +165,12 @@ class Map(Frame):
             self.map[row_index][col_index] = SquareType.FREE
         elif self.map[row_index][col_index] == SquareType.FREE:
             self.map[row_index][col_index] = SquareType.BLOCKED
-        self.draw_square(row_index, col_index)
+        self.__draw_square(row_index, col_index)
 
-    def change_special_square(self, row_index: int, col_index: int,
-                              square_type: SquareType) -> None:
+    def __change_special_square(self, row_index: int, col_index: int,
+                                square_type: SquareType) -> None:
         """
-        This function changes the position of the start or the finish.
+        This method changes the position of the start or the finish.
         :param row_index: new row index.
         :param col_index: new column index.
         :param square_type: start or finish.
@@ -190,10 +193,10 @@ class Map(Frame):
             = SquareType.START
         self.map[self.finish_position[0]][self.finish_position[1]] \
             = SquareType.FINISH
-        self.draw_square(old_row, old_col)
-        self.draw_square(row_index, col_index)
+        self.__draw_square(old_row, old_col)
+        self.__draw_square(row_index, col_index)
 
-    def draw_square(self, row_index: int, col_index: int) -> None:
+    def __draw_square(self, row_index: int, col_index: int) -> None:
         """
         This method draws a square at given coordinates.
         :param row_index: row index.

@@ -34,15 +34,19 @@ class Edges:
 		"""
 		return self.list_of_neigbours.setdefault(cell, {}).items()
 
+	def get_edge_cost(self, cell_1: Cell, cell_2: Cell) -> int:
+		return self.list_of_neigbours[cell_1][cell_2]
+
 	@staticmethod
 	def set_edges(edges_dict: dict, field: Field):
 		"""
 		This method transform dictionary with edges into Edges instance
 		"""
-		if edges_dict == None:
-			return None
 		edges = Edges()
-		for (cell_coord_1, cell_coord_2), weight in edges_dict.items():
-			edges._add_edge(field.get_cell(cell_coord_1), field.get_cell(cell_coord_2), weight)
+		if edges_dict == None:
+			edges.appoint_unit_edges_costs(field)
+		else:
+			for (cell_coord_1, cell_coord_2), weight in edges_dict.items():
+				edges._add_edge(field.get_cell(cell_coord_1), field.get_cell(cell_coord_2), weight)
 		return edges
 		

@@ -34,7 +34,7 @@ class Field:
 		"""
 		return self.board[cell_coord[0]][cell_coord[1]]
 
-	def get_neigbours(self, cell: Cell):
+	def get_neigbours(self, cell: Cell) -> [Cell]:
 		"""
 		This method returns all unlock neigbours of given cell
 		"""

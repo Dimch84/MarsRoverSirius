@@ -1,5 +1,6 @@
 from enum import IntEnum
 from itertools import product
+from os.path import exists
 from random import random, randrange
 from tkinter import BOTH, Canvas, Event, Frame
 
@@ -102,6 +103,8 @@ class Map(Frame):
                     file.write(str(int(self.map[i][j])))
                     file.write(' ')
                 file.write('\n')
+            file.write(f'{self.start_position[0]} {self.start_position[1]}\n')
+            file.write(f'{self.finish_position[0]} {self.finish_position[1]}\n')
 
     def load(self, file_name: str) -> None:
         """
@@ -109,10 +112,15 @@ class Map(Frame):
         :param file_name: input file name.
         :return:
         """
+        if not exists(file_name):
+            print(f'Could not load "{file_name}", file does not exist.')
+            return
         with open(file_name, 'r') as file:
             for i in range(self.height):
                 self.map[i] = list(map(lambda x: SquareType(int(x)),
                                        file.readline().split()))
+            self.start_position = tuple(map(int, file.readline().split()))
+            self.finish_position = tuple(map(int, file.readline().split()))
 
     def draw(self) -> None:
         """

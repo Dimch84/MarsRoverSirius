@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import IntEnum
 from itertools import product
 from random import random, randrange
 from tkinter import BOTH, Canvas, Event, Frame
 
 
-class SquareType(Enum):
+class SquareType(IntEnum):
     FREE = 0
     BLOCKED = 1
     START = 2
@@ -89,6 +89,30 @@ class Map(Frame):
         finish_col = randrange(self.width)
         self.finish_position = (finish_row, finish_col)
         self.map[finish_row][finish_col] = SquareType.FINISH
+
+    def save(self, file_name: str) -> None:
+        """
+        Saves the map to a text file.
+        :param file_name: output file name.
+        :return:
+        """
+        with open(file_name, 'w') as file:
+            for i in range(self.height):
+                for j in range(self.width):
+                    file.write(str(int(self.map[i][j])))
+                    file.write(' ')
+                file.write('\n')
+
+    def load(self, file_name: str) -> None:
+        """
+        Loads the map from a text file.
+        :param file_name: input file name.
+        :return:
+        """
+        with open(file_name, 'r') as file:
+            for i in range(self.height):
+                self.map[i] = list(map(lambda x: SquareType(int(x)),
+                                       file.readline().split()))
 
     def draw(self) -> None:
         """

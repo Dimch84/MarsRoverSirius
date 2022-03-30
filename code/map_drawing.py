@@ -1,7 +1,8 @@
 import pygame
 
-def map_drawing (n, m, map, start_point, finish_point, 
-                mars_rover_path):
+def map_drawing (n: int, m: int, map: list,
+                 start_point: list, finish_point: list, 
+                 mars_rover_path: str) -> None:
 
     if n == 0 or m == 0:
         print ("Error: invalid map size")
@@ -21,9 +22,6 @@ def map_drawing (n, m, map, start_point, finish_point,
     words_font = pygame.font.SysFont("comicsansms", 35)
 
     # color
-    white = (255, 255, 255)
-    red = (213, 50, 80)
-    blue = (50, 153, 213)
     obstacle_color = (149, 163, 0)
     background_color = (241, 253, 114)
     text_color = (106, 35, 126)
@@ -52,9 +50,9 @@ def map_drawing (n, m, map, start_point, finish_point,
         
         #out start and finish
         screen.blit(words_font.render("start", True, text_color),
-                 dest = (size_cell * start_point[1], size_cell * start_point[0]))
+                    dest = (size_cell * start_point[1], size_cell * start_point[0]))
         screen.blit(words_font.render("finish", True, text_color),
-                 dest = (size_cell * finish_point[1], size_cell * finish_point[0]))
+                    dest = (size_cell * finish_point[1], size_cell * finish_point[0]))
 
 
         # drawing movement Mars rover
@@ -94,6 +92,6 @@ def map_drawing (n, m, map, start_point, finish_point,
 
 
 # exemple
-map_drawing(4, 7, 
-            [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
-            (3, 0), (3, 3), 'RUURRRRDDLL')
+# map_drawing(4, 7, 
+#            [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
+#            (3, 0), (3, 3), 'RUURRRRDDLL')

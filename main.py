@@ -1,12 +1,12 @@
 from tkinter import Tk
 
-from map import Map
+from field import Field
 
 
 def main():
     root = Tk()
     root.geometry('1000x800')
-    test_map = Map()
+    test_map = Field()
     test_map.load('input.txt')
     test_map.draw()
     root.mainloop()

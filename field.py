@@ -35,6 +35,8 @@ class Field(Frame):
         self.field_data = [[SquareType.FREE for _ in range(width)]
                            for _ in range(height)]
         self.canvas = Canvas(self)
+        self.pack(fill=BOTH, expand=1)
+        self.canvas.pack(fill=BOTH, expand=1)
         self.__add_binds()
         self.generate_random()
 
@@ -94,10 +96,9 @@ class Field(Frame):
         This method draws the field.
         :return:
         """
-        self.pack(fill=BOTH, expand=1)
+        self.canvas.delete('all')
         for i, j in product(range(self.height), range(self.width)):
             self.__draw_square(i, j)
-        self.canvas.pack(fill=BOTH, expand=1)
 
     def __add_binds(self) -> None:
         """

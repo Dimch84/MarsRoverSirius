@@ -4,6 +4,10 @@ from cell import Cell
 from path_planning_algorithm import Path_planning_algorithm
 
 class A_star(Path_planning_algorithm):
+	"""
+	This is child class of parental class Path_planning_algorithm dedicated to A* algorithm, 
+	it inherits some parental class behaviour, but also have its own features  
+	"""
 	def __init__(self,
 		         start_coord: (int, int),
 		         goal_coord: (int, int),
@@ -13,11 +17,14 @@ class A_star(Path_planning_algorithm):
 		self.g_value[self.start] = 0
 		super()._init()
 		
-	def _calculate_priority_value(self, cell: Cell):
+	def _calculate_priority_value(self, cell: Cell) -> (int, int):
 		g_value = self._get_g_value(cell)
 		return (g_value + self._get_heuristic_value(cell), g_value)
 	
 	def _compute_shortest_path(self) -> int:
+		"""
+		This method computes length of the shortest path from start cell to goal cell
+		"""
 		while len(self.priority_queue) > 0 and self.priority_queue.peekitem()[0] != self.goal:
 			current_cell, _ = self.priority_queue.popitem()
 		

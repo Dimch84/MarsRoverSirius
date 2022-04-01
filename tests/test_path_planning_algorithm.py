@@ -41,7 +41,7 @@ def is_path_correct(field: [str], start: (int, int), goal: (int, int), path: [(i
 
 class Test(unittest.TestCase):
 	"""
-	This class check the work of A* algorithm implementation
+	This class check the work correctness of A* and longlife A* algorithms implementations
 	"""
 	functions = [A_star.call, Lifelong_a_star.call]
 	def test_path_length_with_unlock_field(self):

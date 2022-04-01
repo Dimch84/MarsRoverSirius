@@ -5,6 +5,11 @@ from field import Field
 from edges import Edges
 
 class Lifelong_a_star(Path_planning_algorithm):
+	"""
+	This is child class of parental class Path_planning_algorithm dedicated to Lifelong A* algorithm, 
+	it inherits some parental class behaviour, but also have its own features  
+	e.g it has its own property - rhs_value (it's another estimate (also there is g_value) for distance from start sell)
+	"""
 	def __init__(self,
 		         start_coord: (int, int),
 		         goal_coord: (int, int),
@@ -15,11 +20,11 @@ class Lifelong_a_star(Path_planning_algorithm):
 		self.rhs_value[self.start] = 0
 		super()._init()
 
-	def _calculate_priority_value(self, cell: Cell):
+	def _calculate_priority_value(self, cell: Cell) -> (int, int):
 		min_value = min(self._get_rhs_value(cell), self._get_g_value(cell))
 		return (min_value + self._get_heuristic_value(cell), min_value)
 
-	def _get_rhs_value(self, cell: Cell):
+	def _get_rhs_value(self, cell: Cell) -> int:
 		return self.rhs_value.setdefault(cell, self.INFINITY)
 
 	def _update_cell(self, cell: Cell):
@@ -30,7 +35,10 @@ class Lifelong_a_star(Path_planning_algorithm):
 		if self._get_rhs_value(cell) != self._get_g_value(cell):
 			self._set_priority_value(cell)
 
-	def _compute_shortest_path(self):
+	def _compute_shortest_path(self) -> int:
+		"""
+		This method computes length of the shortest path from start cell to goal cell
+		"""
 		while len(self.priority_queue) > 0:
 		 	if self.priority_queue.peekitem()[1] >= self._calculate_priority_value(self.goal):
 		 		if self._get_rhs_value(self.goal) == self._get_g_value(self.goal):

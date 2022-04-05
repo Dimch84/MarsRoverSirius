@@ -19,8 +19,16 @@ class Field(Frame):
     :param height: the height of the field in squares.
     :param density: the likelihood of a square to be blocked.
     """
-    __padding = 10
-    __square_size = 50
+    __padding = 5
+    __left_shift = 0
+    __up_shift = 0
+    __square_size = 128
+    __max_square_size = 256
+    __min_square_size = 8
+    __scale_coefficient = 2
+    __scale_level = __max_square_size // __square_size
+    __visible_width = 100
+    __visible_height = 100
     __start_position = (0, 0)
     __finish_position = (0, 0)
     __alt_pressed = False
@@ -97,7 +105,12 @@ class Field(Frame):
         :return:
         """
         self.__canvas.delete('all')
-        for i, j in product(range(self.__height), range(self.__width)):
+        last_row = min(self.__height - 1,
+                       self.__visible_height + self.__up_shift)
+        last_col = min(self.__width - 1,
+                       self.__visible_width + self.__left_shift)
+        for i, j in product(range(self.__up_shift, last_row + 1),
+                            range(self.__left_shift, last_col + 1)):
             self.__draw_square(i, j)
 
     def __add_binds(self) -> None:
@@ -121,6 +134,50 @@ class Field(Frame):
             self.__alt_pressed = True
         elif key == 'Shift_L' or key == 'Shift_R':
             self.__shift_pressed = True
+        elif key == 'plus':
+            self.__zoom_in()
+        elif key == 'minus':
+            self.__zoom_out()
+        elif key == 'Right':
+            self.__move_right()
+        elif key == 'Left':
+            self.__move_left()
+        elif key == 'Down':
+            self.__move_down()
+        elif key == 'Up':
+            self.__move_up()
+
+    def __zoom_in(self) -> None:
+        if self.__square_size >= self.__max_square_size:
+            return
+        self.__square_size *= self.__scale_coefficient
+        self.__scale_level //= self.__scale_coefficient
+        self.draw()
+
+    def __zoom_out(self) -> None:
+        if self.__square_size <= self.__min_square_size:
+            return
+        self.__square_size //= self.__scale_coefficient
+        self.__scale_level *= self.__scale_coefficient
+        self.draw()
+
+    def __move_right(self) -> None:
+        self.__left_shift = min(self.__left_shift + self.__scale_level,
+                                self.__width)
+        self.draw()
+
+    def __move_left(self) -> None:
+        self.__left_shift = max(self.__left_shift - self.__scale_level, 0)
+        self.draw()
+
+    def __move_down(self) -> None:
+        self.__up_shift = min(self.__up_shift + self.__scale_level,
+                              self.__height)
+        self.draw()
+
+    def __move_up(self) -> None:
+        self.__up_shift = max(self.__up_shift - self.__scale_level, 0)
+        self.draw()
 
     def __process_key_release(self, event: Event) -> None:
         """
@@ -140,8 +197,10 @@ class Field(Frame):
         :param event: tkinter event.
         :return:
         """
-        row_index = (event.y - self.__padding) // self.__square_size
-        col_index = (event.x - self.__padding) // self.__square_size
+        row_index = (event.y - self.__padding) // \
+            self.__square_size + self.__up_shift
+        col_index = (event.x - self.__padding) // \
+            self.__square_size + self.__left_shift
         if row_index < 0 or row_index >= self.__height:
             return
         if col_index < 0 or col_index >= self.__width:
@@ -189,11 +248,11 @@ class Field(Frame):
             self.__finish_position = (row_index, col_index)
         else:
             return
+        start_row, start_col = self.__start_position
+        finish_row, finish_col = self.__finish_position
         self.__field_data[old_row][old_col] = SquareType.FREE
-        self.__field_data[self.__start_position[0]][self.__start_position[1]] \
-            = SquareType.START
-        self.__field_data[self.__finish_position[0]][self.__finish_position[1]] \
-            = SquareType.FINISH
+        self.__field_data[start_row][start_col] = SquareType.START
+        self.__field_data[finish_row][finish_col] = SquareType.FINISH
         self.__draw_square(old_row, old_col)
         self.__draw_square(row_index, col_index)
 
@@ -204,9 +263,11 @@ class Field(Frame):
         :param col_index: column index.
         :return:
         """
-        x0 = self.__padding + col_index * self.__square_size
+        x0 = self.__padding + \
+            (col_index - self.__left_shift) * self.__square_size
         x1 = x0 + self.__square_size
-        y0 = self.__padding + row_index * self.__square_size
+        y0 = self.__padding + \
+            (row_index - self.__up_shift) * self.__square_size
         y1 = y0 + self.__square_size
         square_type = self.__field_data[row_index][col_index]
         color = 'white'

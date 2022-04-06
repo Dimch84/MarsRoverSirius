@@ -40,8 +40,8 @@ class Field(Frame):
         self.__width = width
         self.__height = height
         self.__density = density
-        self.__field_data = [[SquareType.FREE for _ in range(width)]
-                             for _ in range(height)]
+        self.__field_data = []
+        self.reset()
         self.__canvas = Canvas(self)
         self.pack(fill=BOTH, expand=1)
         self.__canvas.pack(fill=BOTH, expand=1)
@@ -53,8 +53,7 @@ class Field(Frame):
         This method randomly fills the field.
         :return:
         """
-        self.__field_data = [[SquareType.FREE for _ in range(self.__width)]
-                             for _ in range(self.__height)]
+        self.reset()
         for i, j in product(range(self.__height), range(self.__width)):
             if random() < self.__density:
                 self.__field_data[i][j] = SquareType.BLOCKED
@@ -74,6 +73,7 @@ class Field(Frame):
         :return:
         """
         with open(file_name, 'w') as file:
+            file.write(f'{self.__width} {self.__height}\n')
             for i in range(self.__height):
                 for j in range(self.__width):
                     file.write(f'{int(self.__field_data[i][j])} ')
@@ -93,11 +93,20 @@ class Field(Frame):
             print(f'Could not load "{file_name}", file does not exist.')
             return
         with open(file_name, 'r') as file:
+            self.__width, self.__height = map(int, file.readline().split())
+            self.reset()
             for i in range(self.__height):
                 self.__field_data[i] = list(map(lambda x: SquareType(int(x)),
                                                 file.readline().split()))
             self.__start_position = tuple(map(int, file.readline().split()))
             self.__finish_position = tuple(map(int, file.readline().split()))
+
+    def reset(self):
+        self.__field_data = [[SquareType.FREE for _ in range(self.__width)]
+                             for _ in range(self.__height)]
+        self.__start_position = (0, 0)
+        self.__finish_position = (0, 0)
+        self.__field_data[0][0] = SquareType.FINISH
 
     def draw(self) -> None:
         """

@@ -101,7 +101,11 @@ class Field(Frame):
             self.__start_position = tuple(map(int, file.readline().split()))
             self.__finish_position = tuple(map(int, file.readline().split()))
 
-    def reset(self):
+    def reset(self) -> None:
+        """
+        This method fills the field with free squares and sets start and finish at (0,0).
+        :return:
+        """
         self.__field_data = [[SquareType.FREE for _ in range(self.__width)]
                              for _ in range(self.__height)]
         self.__start_position = (0, 0)
@@ -157,6 +161,10 @@ class Field(Frame):
             self.__move_up()
 
     def __zoom_in(self) -> None:
+        """
+        This method zooms in the field.
+        :return:
+        """
         if self.__square_size >= self.__max_square_size:
             return
         self.__square_size *= self.__scale_coefficient
@@ -164,6 +172,10 @@ class Field(Frame):
         self.draw()
 
     def __zoom_out(self) -> None:
+        """
+        This method zooms out the field.
+        :return:
+        """
         if self.__square_size <= self.__min_square_size:
             return
         self.__square_size //= self.__scale_coefficient
@@ -171,20 +183,36 @@ class Field(Frame):
         self.draw()
 
     def __move_right(self) -> None:
+        """
+        This method moves right the view of the field.
+        :return:
+        """
         self.__left_shift = min(self.__left_shift + self.__scale_level,
                                 self.__width)
         self.draw()
 
     def __move_left(self) -> None:
+        """
+        This method moves left the view of the field.
+        :return:
+        """
         self.__left_shift = max(self.__left_shift - self.__scale_level, 0)
         self.draw()
 
     def __move_down(self) -> None:
+        """
+        This method moves down the view of the field.
+        :return:
+        """
         self.__up_shift = min(self.__up_shift + self.__scale_level,
                               self.__height)
         self.draw()
 
     def __move_up(self) -> None:
+        """
+        This method moves up the view of the field.
+        :return:
+        """
         self.__up_shift = max(self.__up_shift - self.__scale_level, 0)
         self.draw()
 

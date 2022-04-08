@@ -2,7 +2,7 @@ from enum import IntEnum
 from itertools import product
 from os.path import exists
 from random import random, randrange
-from tkinter import BOTH, Canvas, Event, Frame
+from tkinter import BOTH, Canvas, Event, Frame, TOP
 
 
 class SquareType(IntEnum):
@@ -12,9 +12,62 @@ class SquareType(IntEnum):
     FINISH = 3
 
 
+SquareTypeColor = {
+    SquareType.FREE: 'green',
+    SquareType.BLOCKED: 'red',
+    SquareType.START: 'blue',
+    SquareType.FINISH: 'yellow'
+}
+
+
+class Square:
+    def __init__(
+            self, canvas: Canvas, square_type: SquareType = SquareType.FREE,
+            size: int = 0, position: tuple = (0, 0), square_id: int = None):
+        self.__canvas = canvas
+        self.square_type = square_type
+        self.position = position
+        self.size = size
+        self.__square_id = square_id
+
+    def move(self, delta: tuple = (0, 0)):
+        if self.__square_id is None:
+            self.__create()
+        self.__canvas.move(self.__square_id, delta[0], delta[1])
+
+    def draw(self, size: int = None, position: tuple = None):
+        if size is not None:
+            self.size = size
+        if position is not None:
+            self.position = position
+        if self.__square_id is None:
+            self.__create()
+        else:
+            x0, y0, x1, y1 = self.get_coordinates()
+            self.__canvas.coords(self.__square_id, x0, y0, x1, y1)
+
+    def change_type(self, square_type: SquareType):
+        self.square_type = square_type
+        if self.__square_id is None:
+            self.__create()
+        else:
+            self.__canvas.itemconfig(self.__square_id,
+                                     fill=SquareTypeColor[self.square_type])
+
+    def get_coordinates(self) -> tuple:
+        return (self.position[0], self.position[1],
+                self.position[0] + self.size, self.position[1] + self.size)
+
+    def __create(self):
+        x0, y0, x1, y1 = self.get_coordinates()
+        self.__square_id = self.__canvas.create_rectangle(
+            x0, y0, x1, y1, fill=SquareTypeColor[self.square_type])
+
+
 class Field(Frame):
     """
     This class provides methods for generating a field and drawing it on the screen.
+
     :param width: the width of the field in squares.
     :param height: the height of the field in squares.
     :param density: the likelihood of a square to be blocked.
@@ -27,8 +80,6 @@ class Field(Frame):
     __min_square_size = 8
     __scale_coefficient = 2
     __scale_level = __max_square_size // __square_size
-    __visible_width = 100
-    __visible_height = 100
     __start_position = (0, 0)
     __finish_position = (0, 0)
     __alt_pressed = False
@@ -41,42 +92,46 @@ class Field(Frame):
         self.__height = height
         self.__density = density
         self.__field_data = []
-        self.reset()
         self.__canvas = Canvas(self)
-        self.pack(fill=BOTH, expand=1)
+        self.pack(fill=BOTH, side=TOP, expand=1)
         self.__canvas.pack(fill=BOTH, expand=1)
         self.__add_binds()
-        self.generate_random()
+        self.reset()
 
     def generate_random(self) -> None:
         """
         This method randomly fills the field.
+
         :return:
         """
         self.reset()
-        for i, j in product(range(self.__height), range(self.__width)):
+        for row, col in product(range(self.__height), range(self.__width)):
             if random() < self.__density:
-                self.__field_data[i][j] = SquareType.BLOCKED
+                self.__field_data[row][col].change_type(SquareType.BLOCKED)
         start_row = randrange(self.__height)
         start_col = randrange(self.__width)
         self.__start_position = (start_row, start_col)
-        self.__field_data[start_row][start_col] = SquareType.START
+        self.__field_data[start_row][start_col]. \
+            change_type(SquareType.START)
         finish_row = randrange(self.__height)
         finish_col = randrange(self.__width)
         self.__finish_position = (finish_row, finish_col)
-        self.__field_data[finish_row][finish_col] = SquareType.FINISH
+        self.__field_data[finish_row][finish_col]. \
+            change_type(SquareType.FINISH)
 
     def save(self, file_name: str) -> None:
         """
         This method saves the field to a text file.
+
         :param file_name: output file name.
         :return:
         """
         with open(file_name, 'w') as file:
             file.write(f'{self.__width} {self.__height}\n')
-            for i in range(self.__height):
-                for j in range(self.__width):
-                    file.write(f'{int(self.__field_data[i][j])} ')
+            for row in range(self.__height):
+                for col in range(self.__width):
+                    square_type = self.__field_data[row][col].square_type
+                    file.write(f'{int(square_type)} ')
                 file.write('\n')
             file.write(f'{self.__start_position[0]} '
                        f'{self.__start_position[1]}\n')
@@ -86,6 +141,7 @@ class Field(Frame):
     def load(self, file_name: str) -> None:
         """
         This method loads the field from a text file.
+
         :param file_name: input file name.
         :return:
         """
@@ -95,50 +151,77 @@ class Field(Frame):
         with open(file_name, 'r') as file:
             self.__width, self.__height = map(int, file.readline().split())
             self.reset()
-            for i in range(self.__height):
-                self.__field_data[i] = list(map(lambda x: SquareType(int(x)),
-                                                file.readline().split()))
+            for row in range(self.__height):
+                square_types = list(map(lambda x: SquareType(int(x)),
+                                        file.readline().split()))
+                for col in range(self.__width):
+                    self.__field_data[row][col].change_type(square_types[col])
             self.__start_position = tuple(map(int, file.readline().split()))
             self.__finish_position = tuple(map(int, file.readline().split()))
 
     def reset(self) -> None:
         """
         This method fills the field with free squares and sets start and finish at (0,0).
-        :return:
-        """
-        self.__field_data = [[SquareType.FREE for _ in range(self.__width)]
-                             for _ in range(self.__height)]
-        self.__start_position = (0, 0)
-        self.__finish_position = (0, 0)
-        self.__field_data[0][0] = SquareType.FINISH
 
-    def draw(self) -> None:
-        """
-        This method draws the field.
         :return:
         """
         self.__canvas.delete('all')
-        last_row = min(self.__height - 1,
-                       self.__visible_height + self.__up_shift)
-        last_col = min(self.__width - 1,
-                       self.__visible_width + self.__left_shift)
-        for i, j in product(range(self.__up_shift, last_row + 1),
-                            range(self.__left_shift, last_col + 1)):
-            self.__draw_square(i, j)
+        self.__field_data = [[Square(self.__canvas, size=self.__square_size)
+                             for _ in range(self.__width)]
+                             for _ in range(self.__height)]
+        self.__start_position = (0, 0)
+        self.__finish_position = (0, 0)
+        self.__field_data[0][0].change_type(SquareType.FINISH)
+        self.__draw()
+
+    def get_frame_width(self) -> int:
+        """
+        This method returns the width of the field on the screen.
+
+        :return: field frame width.
+        """
+        self.update()
+        return self.winfo_width()
+
+    def get_frame_height(self) -> int:
+        """
+        This method returns the height of the field on the screen.
+
+        :return: field frame height.
+        """
+        self.update()
+        return self.winfo_height()
+
+    def __draw(self) -> None:
+        """
+        This method draws the field.
+
+        :return:
+        """
+        # last_row = min(self.__height - 1,
+        #                self.__get_height_in_squares() + self.__up_shift)
+        # last_col = min(self.__width - 1,
+        #                self.__get_width_in_squares() + self.__left_shift)
+        for row, col in product(range(self.__height),
+                                range(self.__width)):
+            self.__draw_square(row, col)
 
     def __add_binds(self) -> None:
         """
         This method adds binds to this class to process user input.
+
         :return:
         """
         self.__canvas.bind('<Button>', self.__change_square)
         self.focus_set()
         self.bind('<KeyPress>', self.__process_key_press)
         self.bind('<KeyRelease>', self.__process_key_release)
+        # self.__canvas.bind('<Configure>', lambda _: self.draw())
 
     def __process_key_press(self, event: Event) -> None:
         """
         This method processes a key press event, it should be used in widget.bind.
+
         :param event: tkinter event.
         :return:
         """
@@ -163,62 +246,91 @@ class Field(Frame):
     def __zoom_in(self) -> None:
         """
         This method zooms in the field.
+
         :return:
         """
         if self.__square_size >= self.__max_square_size:
             return
         self.__square_size *= self.__scale_coefficient
         self.__scale_level //= self.__scale_coefficient
-        self.draw()
+        self.__canvas.scale('all', self.__padding, self.__padding,
+                            self.__scale_coefficient,
+                            self.__scale_coefficient)
 
     def __zoom_out(self) -> None:
         """
         This method zooms out the field.
+
         :return:
         """
         if self.__square_size <= self.__min_square_size:
             return
         self.__square_size //= self.__scale_coefficient
         self.__scale_level *= self.__scale_coefficient
-        self.draw()
+        self.__canvas.scale('all', self.__padding, self.__padding,
+                            1 / self.__scale_coefficient,
+                            1 / self.__scale_coefficient)
 
     def __move_right(self) -> None:
         """
         This method moves right the view of the field.
+
         :return:
         """
-        self.__left_shift = min(self.__left_shift + self.__scale_level,
-                                self.__width)
-        self.draw()
+        if self.__left_shift + self.__scale_level > self.__width:
+            delta = -(self.__width - self.__left_shift) * self.__square_size
+            self.__left_shift = self.__width
+        else:
+            delta = -self.__scale_level * self.__square_size
+            self.__left_shift += self.__scale_level
+        self.__canvas.move('all', delta, 0)
 
     def __move_left(self) -> None:
         """
         This method moves left the view of the field.
+
         :return:
         """
-        self.__left_shift = max(self.__left_shift - self.__scale_level, 0)
-        self.draw()
+        if self.__left_shift - self.__scale_level < 0:
+            delta = self.__left_shift * self.__square_size
+            self.__left_shift = 0
+        else:
+            delta = self.__scale_level * self.__square_size
+            self.__left_shift -= self.__scale_level
+        self.__canvas.move('all', delta, 0)
 
     def __move_down(self) -> None:
         """
         This method moves down the view of the field.
+
         :return:
         """
-        self.__up_shift = min(self.__up_shift + self.__scale_level,
-                              self.__height)
-        self.draw()
+        if self.__up_shift + self.__scale_level > self.__height:
+            delta = -(self.__height - self.__up_shift) * self.__square_size
+            self.__up_shift = self.__height
+        else:
+            delta = -self.__scale_level * self.__square_size
+            self.__up_shift += self.__scale_level
+        self.__canvas.move('all', 0, delta)
 
     def __move_up(self) -> None:
         """
         This method moves up the view of the field.
+
         :return:
         """
-        self.__up_shift = max(self.__up_shift - self.__scale_level, 0)
-        self.draw()
+        if self.__up_shift - self.__scale_level < 0:
+            delta = self.__up_shift * self.__square_size
+            self.__up_shift = 0
+        else:
+            delta = self.__scale_level * self.__square_size
+            self.__up_shift -= self.__scale_level
+        self.__canvas.move('all', 0, delta)
 
     def __process_key_release(self, event: Event) -> None:
         """
         This method processes a key release event, it should be used in widget.bind.
+
         :param event: tkinter event.
         :return:
         """
@@ -231,6 +343,7 @@ class Field(Frame):
     def __change_square(self, event: Event) -> None:
         """
         This method changes a square on mouse click, it should be used in widget.bind.
+
         :param event: tkinter event.
         :return:
         """
@@ -254,26 +367,28 @@ class Field(Frame):
     def __change_normal_square(self, row_index: int, col_index: int) -> None:
         """
         This method changes a square from free to blocked and vice versa.
+
         :param row_index: row index.
         :param col_index: column index.
         :return:
         """
-        if self.__field_data[row_index][col_index] == SquareType.BLOCKED:
-            self.__field_data[row_index][col_index] = SquareType.FREE
-        elif self.__field_data[row_index][col_index] == SquareType.FREE:
-            self.__field_data[row_index][col_index] = SquareType.BLOCKED
-        self.__draw_square(row_index, col_index)
+        square = self.__field_data[row_index][col_index]
+        if square.square_type == SquareType.BLOCKED:
+            square.change_type(SquareType.FREE)
+        elif square.square_type == SquareType.FREE:
+            square.change_type(SquareType.BLOCKED)
 
     def __change_special_square(self, row_index: int, col_index: int,
                                 square_type: SquareType) -> None:
         """
         This method changes the position of the start or the finish.
+
         :param row_index: new row index.
         :param col_index: new column index.
         :param square_type: start or finish.
         :return:
         """
-        if self.__field_data[row_index][col_index] == square_type:
+        if self.__field_data[row_index][col_index].square_type == square_type:
             return
         if square_type == SquareType.START:
             old_row = self.__start_position[0]
@@ -287,33 +402,40 @@ class Field(Frame):
             return
         start_row, start_col = self.__start_position
         finish_row, finish_col = self.__finish_position
-        self.__field_data[old_row][old_col] = SquareType.FREE
-        self.__field_data[start_row][start_col] = SquareType.START
-        self.__field_data[finish_row][finish_col] = SquareType.FINISH
-        self.__draw_square(old_row, old_col)
-        self.__draw_square(row_index, col_index)
+        self.__field_data[old_row][old_col]. \
+            change_type(SquareType.FREE)
+        self.__field_data[start_row][start_col]. \
+            change_type(SquareType.START)
+        self.__field_data[finish_row][finish_col]. \
+            change_type(SquareType.FINISH)
 
     def __draw_square(self, row_index: int, col_index: int) -> None:
         """
         This method draws a square at given coordinates.
+
         :param row_index: row index.
         :param col_index: column index.
         :return:
         """
         x0 = self.__padding + \
             (col_index - self.__left_shift) * self.__square_size
-        x1 = x0 + self.__square_size
         y0 = self.__padding + \
             (row_index - self.__up_shift) * self.__square_size
-        y1 = y0 + self.__square_size
-        square_type = self.__field_data[row_index][col_index]
-        color = 'white'
-        if square_type == SquareType.FREE:
-            color = 'green'
-        elif square_type == SquareType.BLOCKED:
-            color = 'red'
-        elif square_type == SquareType.START:
-            color = 'blue'
-        elif square_type == SquareType.FINISH:
-            color = 'yellow'
-        self.__canvas.create_rectangle(x0, y0, x1, y1, fill=color)
+        self.__field_data[row_index][col_index] \
+            .draw(self.__square_size, (x0, y0))
+
+    def __get_width_in_squares(self) -> int:
+        """
+        This method returns the number of squares that would be enough to cover the frame horizontally.
+
+        :return: the number of squares.
+        """
+        return self.get_frame_width() // self.__square_size + 1
+
+    def __get_height_in_squares(self) -> int:
+        """
+        This method returns the number of squares that would be enough to cover the frame vertically.
+
+        :return: the number of squares.
+        """
+        return self.get_frame_height() // self.__square_size + 1

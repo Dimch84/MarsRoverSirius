@@ -21,6 +21,15 @@ SquareTypeColor = {
 
 
 class Square:
+    """
+    This class contains information about one square on the canvas and provides methods to change its parameters.
+
+    :param canvas: the canvas on which to draw the square.
+    :param square_type: the type of the square.
+    :param size: the size of the square.
+    :param position: the position of the top left corner of the square.
+    :param square_id: the id of the square on the canvas.
+    """
     def __init__(
             self, canvas: Canvas, square_type: SquareType = SquareType.FREE,
             size: int = 0, position: tuple = (0, 0), square_id: int = None):
@@ -30,12 +39,14 @@ class Square:
         self.size = size
         self.__square_id = square_id
 
-    def move(self, delta: tuple = (0, 0)):
-        if self.__square_id is None:
-            self.__create()
-        self.__canvas.move(self.__square_id, delta[0], delta[1])
+    def draw(self, size: int = None, position: tuple = None) -> None:
+        """
+        This method changes the size and the position of this square and draws it on the canvas.
 
-    def draw(self, size: int = None, position: tuple = None):
+        :param size: new size of the square.
+        :param position: new position of the square.
+        :return:
+        """
         if size is not None:
             self.size = size
         if position is not None:
@@ -46,7 +57,13 @@ class Square:
             x0, y0, x1, y1 = self.get_coordinates()
             self.__canvas.coords(self.__square_id, x0, y0, x1, y1)
 
-    def change_type(self, square_type: SquareType):
+    def change_type(self, square_type: SquareType) -> None:
+        """
+        This method changes the type of this square.
+
+        :param square_type: new type of the square.
+        :return:
+        """
         self.square_type = square_type
         if self.__square_id is None:
             self.__create()
@@ -55,10 +72,20 @@ class Square:
                                      fill=SquareTypeColor[self.square_type])
 
     def get_coordinates(self) -> tuple:
+        """
+        This method returns the position of the top left and bottom right corners of this square.
+
+        :return: 4 coordinates.
+        """
         return (self.position[0], self.position[1],
                 self.position[0] + self.size, self.position[1] + self.size)
 
-    def __create(self):
+    def __create(self) -> None:
+        """
+        This method creates a new square on the canvas.
+
+        :return:
+        """
         x0, y0, x1, y1 = self.get_coordinates()
         self.__square_id = self.__canvas.create_rectangle(
             x0, y0, x1, y1, fill=SquareTypeColor[self.square_type])

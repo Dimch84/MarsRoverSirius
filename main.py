@@ -9,8 +9,8 @@ def main():
     root.geometry("{0}x{1}+0+0".format(
         root.winfo_screenwidth(), root.winfo_screenheight()))
     # root.wm_attributes('-fullscreen', 1)
-    # ui = UI()
     test_map = Field()
+    ui = UI(test_map)
     test_map.load_json('input.json')
     # test_map.generate_random()
     root.mainloop()

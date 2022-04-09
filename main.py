@@ -6,7 +6,9 @@ from ui import UI
 
 def main():
     root = Tk()
-    root.geometry('1000x800')
+    root.geometry("{0}x{1}+0+0".format(
+        root.winfo_screenwidth(), root.winfo_screenheight()))
+    # root.wm_attributes('-fullscreen', 1)
     # ui = UI()
     test_map = Field()
     test_map.load('input.txt')

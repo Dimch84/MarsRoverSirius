@@ -27,14 +27,14 @@ class SquareType(IntEnum):
 
 
 SquareTypeColor = {
-    SquareType.FREE: 'green',
-    SquareType.BLOCKED: 'red',
-    SquareType.TYPE2: 'brown',
-    SquareType.TYPE3: 'cyan',
-    SquareType.TYPE4: 'pink',
-    SquareType.TYPE5: 'orange',
-    SquareType.START: 'blue',
-    SquareType.FINISH: 'yellow'
+    SquareType.FREE: '#009000',
+    SquareType.BLOCKED: '#900000',
+    SquareType.TYPE2: '#a06000',
+    SquareType.TYPE3: '#00b090',
+    SquareType.TYPE4: '#900090',
+    SquareType.TYPE5: '#909090',
+    SquareType.START: '#000090',
+    SquareType.FINISH: '#c0a000'
 }
 
 
@@ -86,8 +86,9 @@ class Square:
         if self.__square_id is None:
             self.__create()
         else:
+            color = SquareTypeColor[self.square_type]
             self.__canvas.itemconfig(self.__square_id,
-                                     fill=SquareTypeColor[self.square_type])
+                                     fill=color, outline=color)
 
     def get_coordinates(self) -> tuple:
         """
@@ -105,8 +106,9 @@ class Square:
         :return:
         """
         x0, y0, x1, y1 = self.get_coordinates()
+        color = SquareTypeColor[self.square_type]
         self.__square_id = self.__canvas.create_rectangle(
-            x0, y0, x1, y1, fill=SquareTypeColor[self.square_type])
+            x0, y0, x1, y1, fill=color, outline=color)
 
 
 class Field(Frame):

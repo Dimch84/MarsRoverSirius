@@ -100,11 +100,9 @@ class Field(Frame):
     :param density: the likelihood of a square to be blocked.
     """
     __padding = 5
-    __left_shift = 0
-    __up_shift = 0
     __square_size = 128
     __max_square_size = 256
-    __min_square_size = 8
+    __min_square_size = 2
     __scale_coefficient = 2
     __scale_level = __max_square_size // __square_size
     __start_position = (0, 0)
@@ -225,10 +223,6 @@ class Field(Frame):
 
         :return:
         """
-        # last_row = min(self.__height - 1,
-        #                self.__get_height_in_squares() + self.__up_shift)
-        # last_col = min(self.__width - 1,
-        #                self.__get_width_in_squares() + self.__left_shift)
         for row, col in product(range(self.__height),
                                 range(self.__width)):
             self.__draw_square(row, col)
@@ -243,7 +237,6 @@ class Field(Frame):
         self.focus_set()
         self.bind('<KeyPress>', self.__process_key_press)
         self.bind('<KeyRelease>', self.__process_key_release)
-        # self.__canvas.bind('<Configure>', lambda _: self.draw())
 
     def __process_key_press(self, event: Event) -> None:
         """

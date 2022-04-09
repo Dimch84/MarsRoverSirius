@@ -6,15 +6,33 @@ from tkinter import BOTH, Canvas, Event, Frame, TOP
 
 
 class SquareType(IntEnum):
-    FREE = 0
-    BLOCKED = 1
-    START = 2
-    FINISH = 3
+    FREE = 1
+    BLOCKED = 2
+    TYPE2 = 3
+    TYPE3 = 4
+    TYPE4 = 5
+    TYPE5 = 6
+    START = 10
+    FINISH = 11
+
+    @classmethod
+    def has_value(cls, value: int) -> bool:
+        """
+        This method checks if this class contains a certain value.
+
+        :param value: the value for which to check whether this class contains it.
+        :return: true if this class contains the value.
+        """
+        return value in cls._value2member_map_
 
 
 SquareTypeColor = {
     SquareType.FREE: 'green',
     SquareType.BLOCKED: 'red',
+    SquareType.TYPE2: 'brown',
+    SquareType.TYPE3: 'cyan',
+    SquareType.TYPE4: 'pink',
+    SquareType.TYPE5: 'orange',
     SquareType.START: 'blue',
     SquareType.FINISH: 'yellow'
 }
@@ -105,10 +123,13 @@ class Field(Frame):
     __min_square_size = 2
     __scale_coefficient = 2
     __scale_level = __max_square_size // __square_size
+    __left_shift = 0
+    __up_shift = 0
     __start_position = (0, 0)
     __finish_position = (0, 0)
     __alt_pressed = False
     __shift_pressed = False
+    __current_type = SquareType.FREE
 
     def __init__(self, width: int = 10, height: int = 10,
                  density: float = 0.5) -> None:
@@ -262,6 +283,21 @@ class Field(Frame):
             self.__move_down()
         elif key == 'Up':
             self.__move_up()
+        elif str.isdigit(key) and SquareType.has_value(int(key)):
+            self.__current_type = SquareType(int(key))
+
+    def __process_key_release(self, event: Event) -> None:
+        """
+        This method processes a key release event, it should be used in widget.bind.
+
+        :param event: tkinter event.
+        :return:
+        """
+        key = event.keysym
+        if key == 'Alt_L' or key == 'Alt_R':
+            self.__alt_pressed = False
+        elif key == 'Shift_L' or key == 'Shift_R':
+            self.__shift_pressed = False
 
     def __zoom_in(self) -> None:
         """
@@ -347,19 +383,6 @@ class Field(Frame):
             self.__up_shift -= self.__scale_level
         self.__canvas.move('all', 0, delta)
 
-    def __process_key_release(self, event: Event) -> None:
-        """
-        This method processes a key release event, it should be used in widget.bind.
-
-        :param event: tkinter event.
-        :return:
-        """
-        key = event.keysym
-        if key == 'Alt_L' or key == 'Alt_R':
-            self.__alt_pressed = False
-        elif key == 'Shift_L' or key == 'Shift_R':
-            self.__shift_pressed = False
-
     def __change_square(self, event: Event) -> None:
         """
         This method changes a square on mouse click, it should be used in widget.bind.
@@ -386,17 +409,18 @@ class Field(Frame):
 
     def __change_normal_square(self, row_index: int, col_index: int) -> None:
         """
-        This method changes a square from free to blocked and vice versa.
+        This method changes a square to the current chosen type if it is not the start or the finish.
 
         :param row_index: row index.
         :param col_index: column index.
         :return:
         """
+
         square = self.__field_data[row_index][col_index]
-        if square.square_type == SquareType.BLOCKED:
-            square.change_type(SquareType.FREE)
-        elif square.square_type == SquareType.FREE:
-            square.change_type(SquareType.BLOCKED)
+        if square.square_type == SquareType.START or \
+                square.square_type == SquareType.FINISH:
+            return
+        square.change_type(self.__current_type)
 
     def __change_special_square(self, row_index: int, col_index: int,
                                 square_type: SquareType) -> None:

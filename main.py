@@ -11,10 +11,10 @@ def main():
     # root.wm_attributes('-fullscreen', 1)
     # ui = UI()
     test_map = Field()
-    test_map.load('input.txt')
+    test_map.load_json('input.json')
     # test_map.generate_random()
     root.mainloop()
-    test_map.save('output.txt')
+    test_map.save_json('output.json')
 
 
 if __name__ == '__main__':

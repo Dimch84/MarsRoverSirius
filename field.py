@@ -1,5 +1,6 @@
 from enum import IntEnum
 from itertools import product
+from json import dump, load
 from os.path import exists
 from random import random, randrange
 from tkinter import BOTH, Canvas, Event, Frame, TOP
@@ -167,7 +168,7 @@ class Field(Frame):
         self.__field_data[finish_row][finish_col]. \
             change_type(SquareType.FINISH)
 
-    def save(self, file_name: str) -> None:
+    def save_txt(self, file_name: str) -> None:
         """
         This method saves the field to a text file.
 
@@ -186,15 +187,14 @@ class Field(Frame):
             file.write(f'{self.__finish_position[0]} '
                        f'{self.__finish_position[1]}\n')
 
-    def load(self, file_name: str) -> None:
+    def load_txt(self, file_name: str) -> None:
         """
         This method loads the field from a text file.
 
         :param file_name: input file name.
         :return:
         """
-        if not exists(file_name):
-            print(f'Could not load "{file_name}", file does not exist.')
+        if not self.__check_file(file_name):
             return
         with open(file_name, 'r') as file:
             self.__width, self.__height = map(int, file.readline().split())
@@ -206,6 +206,46 @@ class Field(Frame):
                     self.__field_data[row][col].change_type(square_types[col])
             self.__start_position = tuple(map(int, file.readline().split()))
             self.__finish_position = tuple(map(int, file.readline().split()))
+
+    def save_json(self, file_name: str) -> None:
+        """
+        This method saves the field to a json file.
+
+        :param file_name: output file name.
+        :return:
+        """
+        field_data = {
+            'width': self.__width,
+            'height': self.__height,
+            'field': [[self.__field_data[row][col].square_type
+                      for col in range(self.__width)]
+                      for row in range(self.__height)],
+            'start': self.__start_position,
+            'finish': self.__finish_position,
+        }
+        with open(file_name, 'w') as file:
+            dump(field_data, file, indent=2)
+
+    def load_json(self, file_name: str) -> None:
+        """
+        This method loads the field from a json file.
+
+        :param file_name: input file name.
+        :return:
+        """
+        if not self.__check_file(file_name):
+            return
+        self.__canvas.delete('all')
+        with open(file_name, 'r') as file:
+            field_data = load(file)
+        self.__width = field_data['width']
+        self.__height = field_data['height']
+        self.reset()
+        for row, col in product(range(self.__height), range(self.__width)):
+            self.__field_data[row][col].change_type(
+                field_data['field'][row][col])
+        self.__start_position = field_data['start']
+        self.__finish_position = field_data['finish']
 
     def reset(self) -> None:
         """
@@ -246,8 +286,7 @@ class Field(Frame):
 
         :return:
         """
-        for row, col in product(range(self.__height),
-                                range(self.__width)):
+        for row, col in product(range(self.__height), range(self.__width)):
             self.__draw_square(row, col)
 
     def __add_binds(self) -> None:
@@ -260,6 +299,19 @@ class Field(Frame):
         self.focus_set()
         self.bind('<KeyPress>', self.__process_key_press)
         self.bind('<KeyRelease>', self.__process_key_release)
+
+    @staticmethod
+    def __check_file(file_name: str) -> bool:
+        """
+        This method checks if a file exists and prints a notification if it doesn't.
+
+        :param file_name: name of the file to check.
+        :return: true if the file exists.
+        """
+        if not exists(file_name):
+            print(f'Could not load "{file_name}", file does not exist.')
+            return False
+        return True
 
     def __process_key_press(self, event: Event) -> None:
         """
@@ -417,7 +469,6 @@ class Field(Frame):
         :param col_index: column index.
         :return:
         """
-
         square = self.__field_data[row_index][col_index]
         if square.square_type == SquareType.START or \
                 square.square_type == SquareType.FINISH:

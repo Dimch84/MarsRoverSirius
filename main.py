@@ -10,10 +10,8 @@ def main():
         root.winfo_screenwidth(), root.winfo_screenheight()))
     # root.wm_attributes('-fullscreen', 1)
     test_map = Field()
-    ui = UI(root, test_map)
-    test_map.load_json('input.json')
+    UI(root, test_map)
     root.mainloop()
-    test_map.save_json('output.json')
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+from csv import reader, writer
 from enum import IntEnum
 from itertools import product
 from json import dump, load
@@ -171,6 +172,83 @@ class Field(Frame):
         self.__field_data[finish_row][finish_col]. \
             change_type(SquareType.FINISH)
 
+    def save_json(self, file_name: str) -> None:
+        """
+        This method saves the field to a json file.
+
+        :param file_name: output file name.
+        :return:
+        """
+        field_data = {
+            'width': self.__width,
+            'height': self.__height,
+            'field': [[self.__field_data[row][col].square_type
+                       for col in range(self.__width)]
+                      for row in range(self.__height)],
+            'start': self.__start_position,
+            'finish': self.__finish_position,
+        }
+        with open(file_name, 'w') as file:
+            dump(field_data, file, indent=2)
+
+    def load_json(self, file_name: str) -> None:
+        """
+        This method loads the field from a json file.
+
+        :param file_name: input file name.
+        :return:
+        """
+        if not self.__check_file(file_name):
+            return
+        with open(file_name, 'r') as file:
+            field_data = load(file)
+        self.__width = field_data['width']
+        self.__height = field_data['height']
+        self.reset()
+        for row, col in product(range(self.__height), range(self.__width)):
+            self.__field_data[row][col].change_type(
+                field_data['field'][row][col])
+        self.__start_position = field_data['start']
+        self.__finish_position = field_data['finish']
+
+    def save_csv(self, file_name: str) -> None:
+        """
+        This method saves the field to a csv file.
+
+        :param file_name: output file name.
+        :return:
+        """
+        field_data = [(self.__width, self.__height)]
+        field_data += [[self.__field_data[row][col].square_type
+                        for col in range(self.__width)]
+                       for row in range(self.__height)]
+        field_data.append(self.__start_position)
+        field_data.append(self.__finish_position)
+        with open(file_name, 'w') as file:
+            file_writer = writer(file)
+            file_writer.writerows(field_data)
+
+    def load_csv(self, file_name: str) -> None:
+        """
+        This method loads the field from a csv file.
+
+        :param file_name: input file name.
+        :return:
+        """
+        if not self.__check_file(file_name):
+            return
+        with open(file_name, 'r') as file:
+            file_reader = reader(file)
+            field_data = []
+            for line in file_reader:
+                field_data.append(list(map(int, line)))
+        self.__width, self.__height = field_data[0]
+        self.reset()
+        for row, col in product(range(self.__height), range(self.__width)):
+            self.__field_data[row][col].change_type(field_data[row + 1][col])
+        self.__start_position = field_data[-2]
+        self.__finish_position = field_data[-1]
+
     def save_txt(self, file_name: str) -> None:
         """
         This method saves the field to a text file.
@@ -209,46 +287,6 @@ class Field(Frame):
                     self.__field_data[row][col].change_type(square_types[col])
             self.__start_position = tuple(map(int, file.readline().split()))
             self.__finish_position = tuple(map(int, file.readline().split()))
-
-    def save_json(self, file_name: str) -> None:
-        """
-        This method saves the field to a json file.
-
-        :param file_name: output file name.
-        :return:
-        """
-        field_data = {
-            'width': self.__width,
-            'height': self.__height,
-            'field': [[self.__field_data[row][col].square_type
-                       for col in range(self.__width)]
-                      for row in range(self.__height)],
-            'start': self.__start_position,
-            'finish': self.__finish_position,
-        }
-        with open(file_name, 'w') as file:
-            dump(field_data, file, indent=2)
-
-    def load_json(self, file_name: str) -> None:
-        """
-        This method loads the field from a json file.
-
-        :param file_name: input file name.
-        :return:
-        """
-        if not self.__check_file(file_name):
-            return
-        self.__canvas.delete('all')
-        with open(file_name, 'r') as file:
-            field_data = load(file)
-        self.__width = field_data['width']
-        self.__height = field_data['height']
-        self.reset()
-        for row, col in product(range(self.__height), range(self.__width)):
-            self.__field_data[row][col].change_type(
-                field_data['field'][row][col])
-        self.__start_position = field_data['start']
-        self.__finish_position = field_data['finish']
 
     def reset(self) -> None:
         """
@@ -544,9 +582,9 @@ class Field(Frame):
         :return:
         """
         x0 = self.__padding + \
-             (col_index - self.__left_shift) * self.__square_size
+            (col_index - self.__left_shift) * self.__square_size
         y0 = self.__padding + \
-             (row_index - self.__up_shift) * self.__square_size
+            (row_index - self.__up_shift) * self.__square_size
         self.__field_data[row_index][col_index] \
             .draw(self.__square_size, (x0, y0))
 

@@ -9,6 +9,7 @@ from field import Field
 
 class FileTypes(Enum):
     JSON = 'JSON'
+    CSV = 'CSV'
     TXT = 'TXT'
 
     @classmethod
@@ -126,23 +127,37 @@ class UI(Frame):
         :return:
         """
         file_name = asksaveasfilename()
+        if file_name == '':
+            return
         file_type = self.__file_format.get()
-        if file_type == FileTypes.JSON:
+        print(file_type)
+        if file_type == FileTypes.JSON.value:
+            print('hello_json')
             self.__field.save_json(file_name)
-        elif file_type == FileTypes.TXT:
+        elif file_type == FileTypes.CSV.value:
+            print('hello')
+            self.__field.save_csv(file_name)
+        elif file_type == FileTypes.TXT.value:
+            print('hello_txt')
             self.__field.save_txt(file_name)
+        else:
+            print('???')
 
     def __load(self) -> None:
         """
-        This method load a field from a file.
+        This method loads the field from a file.
 
         :return:
         """
         file_name = askopenfilename()
+        if file_name == '':
+            return
         file_type = self.__file_format.get()
-        if file_type == FileTypes.JSON:
+        if file_type == FileTypes.JSON.value:
             self.__field.load_json(file_name)
-        elif file_type == FileTypes.TXT:
+        elif file_type == FileTypes.CSV.value:
+            self.__field.load_csv(file_name)
+        elif file_type == FileTypes.TXT.value:
             self.__field.save_txt(file_name)
 
     def __generate_random(self) -> None:
@@ -152,7 +167,7 @@ class UI(Frame):
         :return:
         """
         confirmed = askyesno('Generate random',
-                             'Are you sure you want to generate a random map'
+                             'Are you sure you want to generate a random map '
                              '(current map will not be saved)?')
         if not confirmed:
             return
@@ -165,7 +180,7 @@ class UI(Frame):
         :return:
         """
         confirmed = askyesno('Exit',
-                             'Are you sure you want to exit'
+                             'Are you sure you want to exit '
                              '(current map will not be saved)?')
         if not confirmed:
             return

@@ -49,6 +49,7 @@ class Square:
     :param position: the position of the top left corner of the square.
     :param square_id: the id of the square on the canvas.
     """
+
     def __init__(
             self, canvas: Canvas, square_type: SquareType = SquareType.FREE,
             size: int = 0, position: tuple = (0, 0), square_id: int = None):
@@ -130,6 +131,7 @@ class Field(Frame):
     __up_shift = 0
     __start_position = (0, 0)
     __finish_position = (0, 0)
+    __area_start = (0, 0)
     __alt_pressed = False
     __shift_pressed = False
     __current_type = SquareType.FREE
@@ -218,7 +220,7 @@ class Field(Frame):
             'width': self.__width,
             'height': self.__height,
             'field': [[self.__field_data[row][col].square_type
-                      for col in range(self.__width)]
+                       for col in range(self.__width)]
                       for row in range(self.__height)],
             'start': self.__start_position,
             'finish': self.__finish_position,
@@ -255,7 +257,7 @@ class Field(Frame):
         """
         self.__canvas.delete('all')
         self.__field_data = [[Square(self.__canvas, size=self.__square_size)
-                             for _ in range(self.__width)]
+                              for _ in range(self.__width)]
                              for _ in range(self.__height)]
         self.__start_position = (0, 0)
         self.__finish_position = (0, 0)
@@ -295,7 +297,10 @@ class Field(Frame):
 
         :return:
         """
-        self.__canvas.bind('<Button>', self.__change_square)
+        self.__canvas.bind('<Button-1>', self.__change_square)
+        self.__canvas.bind('<B1-Motion>', self.__change_square)
+        self.__canvas.bind('<Button-2>', self.__set_area_start)
+        self.__canvas.bind('<B2-Motion>', self.__change_area)
         self.focus_set()
         self.bind('<KeyPress>', self.__process_key_press)
         self.bind('<KeyRelease>', self.__process_key_release)
@@ -439,27 +444,22 @@ class Field(Frame):
 
     def __change_square(self, event: Event) -> None:
         """
-        This method changes a square on mouse click, it should be used in widget.bind.
+        This method changes a square, it should be used in widget.bind.
 
         :param event: tkinter event.
         :return:
         """
-        row_index = (event.y - self.__padding) // \
-            self.__square_size + self.__up_shift
-        col_index = (event.x - self.__padding) // \
-            self.__square_size + self.__left_shift
-        if row_index < 0 or row_index >= self.__height:
+        row, col = self.__get_index_from_coordinates(event.x, event.y)
+        if row < 0 or row >= self.__height:
             return
-        if col_index < 0 or col_index >= self.__width:
+        if col < 0 or col >= self.__width:
             return
         if self.__alt_pressed:
-            self.__change_special_square(row_index, col_index,
-                                         SquareType.START)
+            self.__change_special_square(row, col, SquareType.START)
         elif self.__shift_pressed:
-            self.__change_special_square(row_index, col_index,
-                                         SquareType.FINISH)
+            self.__change_special_square(row, col, SquareType.FINISH)
         else:
-            self.__change_normal_square(row_index, col_index)
+            self.__change_normal_square(row, col)
 
     def __change_normal_square(self, row_index: int, col_index: int) -> None:
         """
@@ -506,6 +506,34 @@ class Field(Frame):
         self.__field_data[finish_row][finish_col]. \
             change_type(SquareType.FINISH)
 
+    def __set_area_start(self, event: Event) -> None:
+        """
+        This method sets the start of an area that will be changed, it should be used in widget.bind.
+
+        :param event: tkinter event.
+        :return:
+        """
+        self.__area_start = self.__get_index_from_coordinates(event.x, event.y)
+
+    def __change_area(self, event: Event) -> None:
+        """
+        This method changes an area of squares, it should be used in widget.bind.
+
+        :param event: tkinter event.
+        :return:
+        """
+        finish_row, finish_col = self.__get_index_from_coordinates(event.x, event.y)
+        start_row, start_col = self.__area_start
+        if start_row > finish_row:
+            start_row, finish_row = finish_row, start_row
+        if start_col > finish_col:
+            start_col, finish_col = finish_col, start_col
+        finish_row = min(self.__height, finish_row)
+        finish_col = min(self.__width, finish_col)
+        for row, col in product(range(start_row, finish_row + 1),
+                                range(start_col, finish_col + 1)):
+            self.__change_normal_square(row, col)
+
     def __draw_square(self, row_index: int, col_index: int) -> None:
         """
         This method draws a square at given coordinates.
@@ -515,9 +543,9 @@ class Field(Frame):
         :return:
         """
         x0 = self.__padding + \
-            (col_index - self.__left_shift) * self.__square_size
+             (col_index - self.__left_shift) * self.__square_size
         y0 = self.__padding + \
-            (row_index - self.__up_shift) * self.__square_size
+             (row_index - self.__up_shift) * self.__square_size
         self.__field_data[row_index][col_index] \
             .draw(self.__square_size, (x0, y0))
 
@@ -536,3 +564,17 @@ class Field(Frame):
         :return: the number of squares.
         """
         return self.get_frame_height() // self.__square_size + 1
+
+    def __get_index_from_coordinates(self, x: int, y: int) -> tuple:
+        """
+        This method returns a row and a column of a square given coordinates of its inside point.
+
+        :param x: x coordinate of the square.
+        :param y: y coordinate of the square.
+        :return: indices of the row and the column.
+        """
+        row_index = (y - self.__padding) // \
+            self.__square_size + self.__up_shift
+        col_index = (x - self.__padding) // \
+            self.__square_size + self.__left_shift
+        return row_index, col_index

@@ -50,9 +50,10 @@ class Square:
     :param square_id: the id of the square on the canvas.
     """
 
-    def __init__(
-            self, canvas: Canvas, square_type: SquareType = SquareType.FREE,
-            size: int = 0, position: tuple = (0, 0), square_id: int = None):
+    def __init__(self, canvas: Canvas,
+                 square_type: SquareType = SquareType.FREE,
+                 size: int = 0, position: tuple = (0, 0),
+                 square_id: int = None) -> None:
         self.__canvas = canvas
         self.square_type = square_type
         self.position = position

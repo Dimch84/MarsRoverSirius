@@ -22,7 +22,7 @@ class SquareType(IntEnum):
         """
         This method checks if this class contains a certain value.
 
-        :param value: the value for which to check whether this class contains it.
+        :param value: the value for which to check if this class contains it.
         :return: true if this class contains the value.
         """
         return value in cls._value2member_map_
@@ -34,7 +34,7 @@ SquareTypeColor = {
     SquareType.TYPE2: '#a06000',
     SquareType.TYPE3: '#00b090',
     SquareType.TYPE4: '#900090',
-    SquareType.TYPE5: '#909090',
+    SquareType.TYPE5: '#666666',
     SquareType.START: '#000090',
     SquareType.FINISH: '#c0a000'
 }
@@ -42,7 +42,8 @@ SquareTypeColor = {
 
 class Square:
     """
-    This class contains information about one square on the canvas and provides methods to change its parameters.
+    This class contains information about one square on the canvas and provides
+    methods to change its parameters.
 
     :param canvas: the canvas on which to draw the square.
     :param square_type: the type of the square.
@@ -63,7 +64,8 @@ class Square:
 
     def draw(self, size: int = None, position: tuple = None) -> None:
         """
-        This method changes the size and the position of this square and draws it on the canvas.
+        This method changes the size and the position of this square and draws
+        it on the canvas.
 
         :param size: new size of the square.
         :param position: new position of the square.
@@ -96,7 +98,8 @@ class Square:
 
     def get_coordinates(self) -> tuple:
         """
-        This method returns the position of the top left and bottom right corners of this square.
+        This method returns the position of the top left and bottom right
+        corners of this square.
 
         :return: 4 coordinates.
         """
@@ -117,7 +120,8 @@ class Square:
 
 class Field(Frame):
     """
-    This class provides methods for generating a field and drawing it on the screen.
+    This class provides methods for generating a field and drawing it on the
+    screen.
 
     :param width: the width of the field in squares.
     :param height: the height of the field in squares.
@@ -134,6 +138,7 @@ class Field(Frame):
     __start_position = (0, 0)
     __finish_position = (0, 0)
     __area_start = (0, 0)
+    __area = None
     __alt_pressed = False
     __shift_pressed = False
     __current_type = SquareType.FREE
@@ -158,19 +163,18 @@ class Field(Frame):
         :return:
         """
         self.reset()
-        for row, col in product(range(self.__height), range(self.__width)):
-            if random() < self.__density:
-                self.__field_data[row][col].change_type(SquareType.BLOCKED)
         start_row = randrange(self.__height)
         start_col = randrange(self.__width)
-        self.__start_position = (start_row, start_col)
-        self.__field_data[start_row][start_col]. \
-            change_type(SquareType.START)
+        self.__change_special_square(start_row, start_col, SquareType.START)
         finish_row = randrange(self.__height)
         finish_col = randrange(self.__width)
-        self.__finish_position = (finish_row, finish_col)
-        self.__field_data[finish_row][finish_col]. \
-            change_type(SquareType.FINISH)
+        self.__change_special_square(finish_row, finish_col, SquareType.FINISH)
+        for row, col in product(range(self.__height), range(self.__width)):
+            if row == start_row and col == start_col or \
+                    row == finish_row and col == finish_col:
+                continue
+            if random() < self.__density:
+                self.__field_data[row][col].change_type(SquareType.BLOCKED)
 
     def save_json(self, file_name: str) -> None:
         """
@@ -339,7 +343,8 @@ class Field(Frame):
         self.__canvas.bind('<Button-1>', self.__change_square)
         self.__canvas.bind('<B1-Motion>', self.__change_square)
         self.__canvas.bind('<Button-2>', self.__set_area_start)
-        self.__canvas.bind('<B2-Motion>', self.__change_area)
+        self.__canvas.bind('<B2-Motion>', self.__select_area)
+        self.__canvas.bind('<ButtonRelease-2>', self.__change_area)
         self.focus_set()
         self.bind('<KeyPress>', self.__process_key_press)
         self.bind('<KeyRelease>', self.__process_key_release)
@@ -347,7 +352,8 @@ class Field(Frame):
     @staticmethod
     def __check_file(file_name: str) -> bool:
         """
-        This method checks if a file exists and prints a notification if it doesn't.
+        This method checks if a file exists and prints a notification if it
+        doesn't.
 
         :param file_name: name of the file to check.
         :return: true if the file exists.
@@ -359,7 +365,8 @@ class Field(Frame):
 
     def __process_key_press(self, event: Event) -> None:
         """
-        This method processes a key press event, it should be used in widget.bind.
+        This method processes a key press event, it should be used in
+        widget.bind.
 
         :param event: tkinter event.
         :return:
@@ -386,7 +393,8 @@ class Field(Frame):
 
     def __process_key_release(self, event: Event) -> None:
         """
-        This method processes a key release event, it should be used in widget.bind.
+        This method processes a key release event, it should be used in
+        widget.bind.
 
         :param event: tkinter event.
         :return:
@@ -502,7 +510,8 @@ class Field(Frame):
 
     def __change_normal_square(self, row_index: int, col_index: int) -> None:
         """
-        This method changes a square to the current chosen type if it is not the start or the finish.
+        This method changes a square to the current chosen type if it is not
+        the start or the finish.
 
         :param row_index: row index.
         :param col_index: column index.
@@ -547,22 +556,44 @@ class Field(Frame):
 
     def __set_area_start(self, event: Event) -> None:
         """
-        This method sets the start of an area that will be changed, it should be used in widget.bind.
+        This method sets the start of an area that will be changed, it should
+        be used in widget.bind.
 
         :param event: tkinter event.
         :return:
         """
-        self.__area_start = self.__get_index_from_coordinates(event.x, event.y)
+        self.__area_start = event.x, event.y
+
+    def __select_area(self, event: Event) -> None:
+        """
+        This method selects an area that will be changed and draws a rectangle
+        around it, it should be used in widget.bind.
+
+        :param event:
+        :return:
+        """
+        start_x, start_y = self.__area_start
+        if self.__area is None:
+            self.__area = self.__canvas.create_rectangle(start_x, start_y,
+                                                         event.x, event.y,
+                                                         fill='',
+                                                         outline='blue')
+        else:
+            self.__canvas.coords(self.__area, start_x, start_y,
+                                 event.x, event.y)
 
     def __change_area(self, event: Event) -> None:
         """
-        This method changes an area of squares, it should be used in widget.bind.
+        This method changes an area of squares, it should be used in
+        widget.bind.
 
         :param event: tkinter event.
         :return:
         """
-        finish_row, finish_col = self.__get_index_from_coordinates(event.x, event.y)
-        start_row, start_col = self.__area_start
+        finish_row, finish_col = \
+            self.__get_index_from_coordinates(event.x, event.y)
+        start_row, start_col = \
+            self.__get_index_from_coordinates(*self.__area_start)
         if start_row > finish_row:
             start_row, finish_row = finish_row, start_row
         if start_col > finish_col:
@@ -572,6 +603,8 @@ class Field(Frame):
         for row, col in product(range(start_row, finish_row + 1),
                                 range(start_col, finish_col + 1)):
             self.__change_normal_square(row, col)
+        self.__canvas.delete(self.__area)
+        self.__area = None
 
     def __draw_square(self, row_index: int, col_index: int) -> None:
         """
@@ -590,7 +623,8 @@ class Field(Frame):
 
     def __get_width_in_squares(self) -> int:
         """
-        This method returns the number of squares that would be enough to cover the frame horizontally.
+        This method returns the number of squares that would be enough to cover
+        the frame horizontally.
 
         :return: the number of squares.
         """
@@ -598,7 +632,8 @@ class Field(Frame):
 
     def __get_height_in_squares(self) -> int:
         """
-        This method returns the number of squares that would be enough to cover the frame vertically.
+        This method returns the number of squares that would be enough to cover
+        the frame vertically.
 
         :return: the number of squares.
         """
@@ -606,7 +641,8 @@ class Field(Frame):
 
     def __get_index_from_coordinates(self, x: int, y: int) -> tuple:
         """
-        This method returns a row and a column of a square given coordinates of its inside point.
+        This method returns a row and a column of a square given coordinates of
+        its inside point.
 
         :param x: x coordinate of the square.
         :param y: y coordinate of the square.
@@ -616,4 +652,5 @@ class Field(Frame):
             self.__square_size + self.__up_shift
         col_index = (x - self.__padding) // \
             self.__square_size + self.__left_shift
-        return row_index, col_index
+        return min(row_index, self.__height - 1), \
+            min(col_index, self.__width - 1)

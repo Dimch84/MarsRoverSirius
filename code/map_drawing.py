@@ -1,4 +1,5 @@
-from tkinter import CENTER, LAST, Tk, Canvas, Frame, BOTH
+from tkinter import Tk, Canvas, Frame
+import time
 
 from map import Map
 
@@ -11,9 +12,10 @@ class Draw(Frame):
     def initUI(self, map : Map):
 
         self.master.title("Map")
-        self.pack(fill = BOTH, expand = 1)
- 
+        self.pack(fill = 'both', expand = 1)
+
         canvas = Canvas(self)
+        canvas.pack(fill = 'both', expand = 1)
 
         # draw cell
         for i in range (map.m):
@@ -52,7 +54,7 @@ class Draw(Frame):
                             mars_rover_coordinate_y * map.size_cell + map.size_cell // 2,
                             new_mars_rover_coordinate_x * map.size_cell + map.size_cell // 2,
                             new_mars_rover_coordinate_y * map.size_cell + map.size_cell // 2,
-                            arrow = LAST,
+                            arrow = 'last',
                             dash = (5, 2))
 
 
@@ -64,26 +66,66 @@ class Draw(Frame):
         canvas.create_text(map.size_cell * map.start_point[1] + map.size_cell // 2, 
                             map.size_cell * map.start_point[0] + map.size_cell // 2,
                             text = 'START',
-                            justify = CENTER)
+                            justify = 'center')
         canvas.create_text(map.size_cell * map.finish_point[1] + map.size_cell // 2, 
                             map.size_cell * map.finish_point[0] + map.size_cell // 2,
                             text = 'FINISH',
-                            justify = CENTER)
+                            justify = 'center')
 
 
-        canvas.pack(fill = BOTH, expand = 1)
- 
+        
+        # animation
+        
+        mars_rover_coordinate_y = mars_rover_coordinate_x = 1
+
+        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell, 
+                                        map.start_point[0] * map.size_cell,
+                                        (map.start_point[1] + 1) * map.size_cell,
+                                        (map.start_point[0] + 1) * map.size_cell,
+                                        outline = 'black', 
+                                        fill = 'black', 
+                                        width = 1)
+
+        
+
+        for step in map.mars_rover_path:
+            # next coordinate
+            if step == 'U':
+                mars_rover_coordinate_y = -1
+                mars_rover_coordinate_x = 0
+            if step == 'D':
+                mars_rover_coordinate_y = 1
+                mars_rover_coordinate_x = 0
+            if step == 'R':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = 1
+            if step == 'L':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = -1
+
+            #animation
+            for i in range (map.size_cell):
+
+                canvas.move(rover, 
+                            mars_rover_coordinate_x, 
+                            mars_rover_coordinate_y)
+                self.update()
+                canvas.after(10)
+            
+
+            
+
+
  
 
 def map_drawing (map : Map) -> None:
 
     # init screen 
     root = Tk()
-    ex = Draw(map)
     root.title("Map drawing")
     root.geometry("{0}x{1}+0+0".format(
                     map.width + 1, map.height + 1))
-
+    ex = Draw(map)
 
     root.mainloop()
 

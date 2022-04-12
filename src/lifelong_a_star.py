@@ -2,7 +2,6 @@ from path_planning_algorithm import Path_planning_algorithm
 
 from cell import Cell
 from field import Field
-from edges import Edges
 
 class Lifelong_a_star(Path_planning_algorithm):
 	"""
@@ -29,7 +28,7 @@ class Lifelong_a_star(Path_planning_algorithm):
 
 	def _update_cell(self, cell: Cell):
 		if cell != self.start:
-			self.rhs_value[cell] = min([self._get_g_value(neigbour) + self.edges.get_edge_cost(neigbour, cell) for neigbour in self.field.get_neigbours(cell)])
+			self.rhs_value[cell] = min([self._get_g_value(neigbour) + self.field.get_edge_cost(neigbour, cell) for neigbour in self.field.get_neigbours(cell)])
 		if cell in self.priority_queue.keys():
 			self.priority_queue.pop(cell)
 		if self._get_rhs_value(cell) != self._get_g_value(cell):
@@ -50,7 +49,7 @@ class Lifelong_a_star(Path_planning_algorithm):
 		 			self._update_cell(next_cell)
 		 	else:
 		 		self.g_value[current_cell] = INFINITY
-		 		for next_cell in field.get_neigbours(current_cell) + [current_cell]:
+		 		for next_cell in self.field.get_neigbours(current_cell) + [current_cell]:
 		 			self._update_cell(next_cell)
 		return self._get_g_value(self.goal)  
 

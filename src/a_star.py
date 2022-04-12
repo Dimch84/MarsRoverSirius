@@ -28,7 +28,8 @@ class A_star(Path_planning_algorithm):
 		while len(self.priority_queue) > 0 and self.priority_queue.peekitem()[0] != self.goal:
 			current_cell, _ = self.priority_queue.popitem()
 		
-			for next_cell, edge_cost in self.edges.get_neigbours(current_cell):
+			for next_cell in self.field.get_neigbours(current_cell):
+				edge_cost = self.field.get_edge_cost(current_cell, next_cell)
 				new_g_value = self._get_g_value(current_cell) + edge_cost
 				if new_g_value < self._get_g_value(next_cell):
 					self.g_value[next_cell] = new_g_value

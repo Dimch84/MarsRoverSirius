@@ -10,7 +10,6 @@ class Path_planning_algorithm:
 	(right now he have two subclasses: A_star and Lifelong_a_star)
 	Properties:
 		field - field (that is given graph instance)
-		edges - edges (that is given set of graph edges)
 		start - start cell of the route
 		goal - goal cell of the route
 		heuristic_value - dictionary of heuristic values for every cell in the field 
@@ -49,10 +48,9 @@ class Path_planning_algorithm:
 		         field_input: [str],
 		         edges_dict: dict = None):
 		height, width = len(field_input), len(field_input[0])
-		self.field = Field(height, width, field_input)
+		self.field = Field(height, width, field_input, edges_dict)
 		self.start = self.field.get_cell(start_coord)
 		self.goal = self.field.get_cell(goal_coord)
-		self.edges = Edges.set_edges(edges_dict, self.field)
 		self.heuristic_value = dict()
 		self.g_value = dict()
 		self.priority_queue = heapdict()
@@ -74,6 +72,7 @@ class Path_planning_algorithm:
 		"""
 		This method recovering shortest path from start cell to goal cell 
 		"""
+		# print('Hello')
 		cell_on_the_path = self.goal
 		path = [cell_on_the_path]
 		while cell_on_the_path != self.start:

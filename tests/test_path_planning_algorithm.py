@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
 	"""
 	This class check the work correctness of A* and longlife A* algorithms implementations
 	"""
-	functions = [A_star.call, Lifelong_a_star.call]
+	functions = [A_star.call, Lifelong_a_star.call] 
 	def test_path_length_with_unlock_field(self):
 		height, width = 5, 5
 		field = dedent('''\

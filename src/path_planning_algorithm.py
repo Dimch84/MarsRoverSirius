@@ -2,7 +2,6 @@ from heapdict import heapdict
 
 from cell import Cell
 from field import Field
-from edges import Edges
 
 class Path_planning_algorithm:
 	"""

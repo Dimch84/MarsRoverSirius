@@ -569,7 +569,7 @@ class Field(Frame):
         This method selects an area that will be changed and draws a rectangle
         around it, it should be used in widget.bind.
 
-        :param event:
+        :param event: tkinter event.
         :return:
         """
         start_x, start_y = self.__area_start

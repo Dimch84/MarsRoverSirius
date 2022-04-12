@@ -1,5 +1,4 @@
 from tkinter import Tk, Canvas, Frame
-import time
 
 from map import Map
 
@@ -8,7 +7,7 @@ class Draw(Frame):
     def __init__(self, map : Map):
         super().__init__()
         self.initUI(map)
- 
+
     def initUI(self, map : Map):
 
         self.master.title("Map")
@@ -17,19 +16,11 @@ class Draw(Frame):
         canvas = Canvas(self)
         canvas.pack(fill = 'both', expand = 1)
 
-        # draw cell
-        for i in range (map.m):
-            for j in range (map.n):
+        self.draw_map (map, canvas)
+        self.draw_path (map, canvas)
+        self.animation (map, canvas)
 
-                color_cell = 'lavender'
-                if map.map[j][i] == 1:
-                    color_cell = 'gray'
-
-                canvas.create_rectangle(
-                        map.size_cell * i, map.size_cell * j,
-                        map.size_cell * (i + 1), map.size_cell * (j + 1),
-                        outline = 'black', fill = color_cell, width = 1)
-
+    def draw_path (self, map : Map, canvas : Canvas) -> None:
         
         # drawing movement Mars rover
         mars_rover_coordinate_y = map.start_point[0]
@@ -72,8 +63,21 @@ class Draw(Frame):
                             text = 'FINISH',
                             justify = 'center')
 
+    def draw_map (self, map : Map, canvas : Canvas) -> None:
+        # draw cell
+        for i in range (map.m):
+            for j in range (map.n):
 
-        
+                color_cell = 'lavender'
+                if map.map[j][i] == 1:
+                    color_cell = 'gray'
+
+                canvas.create_rectangle(
+                        map.size_cell * i, map.size_cell * j,
+                        map.size_cell * (i + 1), map.size_cell * (j + 1),
+                        outline = 'black', fill = color_cell, width = 1)
+
+    def animation (self, map : Map, canvas : Canvas) -> None:
         # animation
         
         mars_rover_coordinate_y = mars_rover_coordinate_x = 1
@@ -110,13 +114,8 @@ class Draw(Frame):
                             mars_rover_coordinate_x, 
                             mars_rover_coordinate_y)
                 self.update()
-                canvas.after(10)
-            
+                canvas.after(2)
 
-            
-
-
- 
 
 def map_drawing (map : Map) -> None:
 
@@ -128,8 +127,3 @@ def map_drawing (map : Map) -> None:
     ex = Draw(map)
 
     root.mainloop()
-
-
-map_drawing(Map(4, 7, 
-            [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
-            (3, 0), (3, 3), 'RUURRRRDDLL'))

@@ -82,10 +82,14 @@ class Draw(Frame):
         
         mars_rover_coordinate_y = mars_rover_coordinate_x = 1
 
-        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell, 
-                                        map.start_point[0] * map.size_cell,
-                                        (map.start_point[1] + 1) * map.size_cell,
-                                        (map.start_point[0] + 1) * map.size_cell,
+        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
+                                        map.size_cell // 4, 
+                                        map.start_point[0] * map.size_cell + 
+                                        map.size_cell // 4,
+                                        (map.start_point[1] + 1) * map.size_cell - 
+                                        map.size_cell // 4,
+                                        (map.start_point[0] + 1) * map.size_cell -
+                                        map.size_cell // 4,
                                         outline = 'black', 
                                         fill = 'black', 
                                         width = 1)
@@ -114,8 +118,7 @@ class Draw(Frame):
                             mars_rover_coordinate_x, 
                             mars_rover_coordinate_y)
                 self.update()
-                canvas.after(2)
-
+                canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
 
 def map_drawing (map : Map) -> None:
 

@@ -130,18 +130,12 @@ class UI(Frame):
         if file_name == '':
             return
         file_type = self.__file_format.get()
-        print(file_type)
         if file_type == FileTypes.JSON.value:
-            print('hello_json')
             self.__field.save_json(file_name)
         elif file_type == FileTypes.CSV.value:
-            print('hello')
             self.__field.save_csv(file_name)
         elif file_type == FileTypes.TXT.value:
-            print('hello_txt')
             self.__field.save_txt(file_name)
-        else:
-            print('???')
 
     def __load(self) -> None:
         """
@@ -158,7 +152,7 @@ class UI(Frame):
         elif file_type == FileTypes.CSV.value:
             self.__field.load_csv(file_name)
         elif file_type == FileTypes.TXT.value:
-            self.__field.save_txt(file_name)
+            self.__field.load_txt(file_name)
 
     def __generate_random(self) -> None:
         """

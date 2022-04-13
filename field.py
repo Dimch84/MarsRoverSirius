@@ -223,7 +223,7 @@ class Field(Frame):
         :return:
         """
         field_data = [(self.__width, self.__height)]
-        field_data += [[self.__field_data[row][col].square_type
+        field_data += [[int(self.__field_data[row][col].square_type)
                         for col in range(self.__width)]
                        for row in range(self.__height)]
         field_data.append(self.__start_position)

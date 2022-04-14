@@ -2,6 +2,7 @@
 class Map:
 
     max_size_screen_side = 800
+    radius = 2
 
     def __init__(self, 
                  n: int, m: int, map: list,

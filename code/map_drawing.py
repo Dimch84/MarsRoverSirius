@@ -20,6 +20,18 @@ class Draw(Frame):
         self.draw_path (map, canvas)
         self.animation (map, canvas)
 
+    def initUI_dark_mod(self, map : Map):
+
+        self.master.title("Map (dark mode)")
+        self.pack(fill = 'both', expand = 1)
+
+        canvas = Canvas(self)
+        canvas.pack(fill = 'both', expand = 1)
+
+        self.draw_map (map, canvas)
+        self.draw_path (map, canvas)
+        self.animation_with_dawn (map, canvas)
+
     def draw_path (self, map : Map, canvas : Canvas) -> None:
         
         # drawing movement Mars rover
@@ -119,6 +131,69 @@ class Draw(Frame):
                             mars_rover_coordinate_y)
                 self.update()
                 canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
+
+    def animation_with_dawn (self, map : Map, canvas : Canvas) -> None:
+        
+        mars_rover_coordinate_y = mars_rover_coordinate_x = 1
+
+        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
+                                        map.size_cell // 4, 
+                                        map.start_point[0] * map.size_cell + 
+                                        map.size_cell // 4,
+                                        (map.start_point[1] + 1) * map.size_cell - 
+                                        map.size_cell // 4,
+                                        (map.start_point[0] + 1) * map.size_cell -
+                                        map.size_cell // 4,
+                                        outline = 'black', 
+                                        fill = 'black', 
+                                        width = 1)
+
+
+        # black_zone
+        black_lines = []
+        
+        for x in range (-map.m, 2 * map.m):
+            for y in range (-map.n, 2 * map.n):
+                if abs(x - map.start_point[1]) + abs(y - map.start_point[0]) > map.radius:
+                    black_lines.append(
+                        canvas.create_rectangle(
+                                x * map.size_cell,
+                                y * map.size_cell,
+                                (x + 1) * map.size_cell,
+                                (y + 1) * map.size_cell,
+                                fill = 'black',
+                                ))
+
+        for step in map.mars_rover_path:
+            # next coordinate
+            if step == 'U':
+                mars_rover_coordinate_y = -1
+                mars_rover_coordinate_x = 0
+            if step == 'D':
+                mars_rover_coordinate_y = 1
+                mars_rover_coordinate_x = 0
+            if step == 'R':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = 1
+            if step == 'L':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = -1
+
+            #animation
+            for i in range (map.size_cell):
+
+                canvas.move(rover, 
+                            mars_rover_coordinate_x, 
+                            mars_rover_coordinate_y)
+
+                for black_line in black_lines: 
+                    canvas.move(black_line,
+                                mars_rover_coordinate_x, 
+                                mars_rover_coordinate_y)
+
+                self.update()
+                canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
+
 
 def map_drawing (map : Map) -> None:
 

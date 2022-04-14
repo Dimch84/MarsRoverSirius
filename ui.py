@@ -156,6 +156,11 @@ class UI(Frame):
 
         :return:
         """
+        confirmed = askyesno('Load',
+                             'Are you sure you want to load a new map '
+                             '(current map will not be saved)?')
+        if not confirmed:
+            return
         file_name = askopenfilename()
         if file_name == '':
             return
@@ -192,7 +197,8 @@ class UI(Frame):
         if not confirmed:
             return
         size = askinteger('Map size',
-                          'Enter the size of a new map')
+                          'Enter the size of a new map',
+                          initialvalue=100)
         if size is None:
             return
         self.__field.reset(size, size)

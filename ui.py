@@ -2,6 +2,7 @@ from tkinter import BOTH, BOTTOM, Button, Frame, \
     Label, LEFT, OptionMenu, StringVar, Tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesno
+from tkinter.simpledialog import askinteger
 from enum import Enum
 
 from field import Field
@@ -39,6 +40,7 @@ class UI(Frame):
         self.__save_button = Button()
         self.__load_button = Button()
         self.__random_button = Button()
+        self.__new_button = Button()
         self.__exit_button = Button()
         self.__file_format = StringVar()
         self.__configure()
@@ -52,6 +54,7 @@ class UI(Frame):
         self.__configure_save_button()
         self.__configure_load_button()
         self.__configure_random_button()
+        self.__configure_new_button()
         self.__configure_exit_button()
         self.__configure_file_format_menu()
 
@@ -77,13 +80,23 @@ class UI(Frame):
 
     def __configure_random_button(self) -> None:
         """
-        This method configures the 'generate random' button.
+        This method configures the 'randomise' button.
 
         :return:
         """
         self.__configure_button(self.__random_button)
-        self.__random_button.config(text='Generate random',
+        self.__random_button.config(text='Randomise',
                                     command=self.__generate_random)
+
+    def __configure_new_button(self) -> None:
+        """
+        This method configures the 'new' button.
+
+        :return:
+        """
+        self.__configure_button(self.__new_button)
+        self.__new_button.config(text='New',
+                                 command=self.__create_new)
 
     def __configure_exit_button(self) -> None:
         """
@@ -160,12 +173,29 @@ class UI(Frame):
 
         :return:
         """
-        confirmed = askyesno('Generate random',
-                             'Are you sure you want to generate a random map '
-                             '(current map will not be saved)?')
+        confirmed = askyesno('Randomise',
+                             'Are you sure you want to randomise this map '
+                             '(current state of the map will not be saved)?')
         if not confirmed:
             return
         self.__field.generate_random()
+
+    def __create_new(self) -> None:
+        """
+        This method creates a new field.
+
+        :return:
+        """
+        confirmed = askyesno('New',
+                             'Are you sure you want to create a new map '
+                             '(current map will not be saved)?')
+        if not confirmed:
+            return
+        size = askinteger('Map size',
+                          'Enter the size of a new map')
+        if size is None:
+            return
+        self.__field.reset(size, size)
 
     def __exit(self) -> None:
         """

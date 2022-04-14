@@ -206,9 +206,7 @@ class Field(Frame):
             return
         with open(file_name, 'r') as file:
             field_data = load(file)
-        self.__width = field_data['width']
-        self.__height = field_data['height']
-        self.reset()
+        self.reset(field_data['width'], field_data['height'])
         for row, col in product(range(self.__height), range(self.__width)):
             self.__field_data[row][col].change_type(
                 field_data['field'][row][col])
@@ -246,8 +244,7 @@ class Field(Frame):
             field_data = []
             for line in file_reader:
                 field_data.append(list(map(int, line)))
-        self.__width, self.__height = field_data[0]
-        self.reset()
+        self.reset(*field_data[0])
         for row, col in product(range(self.__height), range(self.__width)):
             self.__field_data[row][col].change_type(field_data[row + 1][col])
         self.__start_position = field_data[-2]
@@ -282,8 +279,8 @@ class Field(Frame):
         if not self.__check_file(file_name):
             return
         with open(file_name, 'r') as file:
-            self.__width, self.__height = map(int, file.readline().split())
-            self.reset()
+            new_width, new_height = map(int, file.readline().split())
+            self.reset(new_width, new_height)
             for row in range(self.__height):
                 square_types = list(map(lambda x: SquareType(int(x)),
                                         file.readline().split()))
@@ -292,13 +289,19 @@ class Field(Frame):
             self.__start_position = tuple(map(int, file.readline().split()))
             self.__finish_position = tuple(map(int, file.readline().split()))
 
-    def reset(self) -> None:
+    def reset(self, new_width: int = None, new_height: int = None) -> None:
         """
         This method fills the field with free squares and sets start and finish at (0,0).
 
+        :param new_width: the new width of the field.
+        :param new_height: the new height of the field.
         :return:
         """
         self.__canvas.delete('all')
+        if new_width is not None:
+            self.__width = new_width
+        if new_height is not None:
+            self.__height = new_height
         self.__field_data = [[Square(self.__canvas, size=self.__square_size)
                               for _ in range(self.__width)]
                              for _ in range(self.__height)]

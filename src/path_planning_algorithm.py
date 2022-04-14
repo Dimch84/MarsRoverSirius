@@ -54,9 +54,6 @@ class Path_planning_algorithm:
 		self.g_value = dict()
 		self.priority_queue = heapdict()
 
-	def _init(self):
-		self._set_priority_value(self.start)
-
 	def _get_heuristic_value(self, cell: Cell) -> int:
 		return self.heuristic_value.setdefault(cell, self.field.calculate_heuristic_value(cell, self.goal))
 

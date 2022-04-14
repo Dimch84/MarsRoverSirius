@@ -15,7 +15,7 @@ class A_star(Path_planning_algorithm):
 		         edges_dict: dict = None):
 		super().__init__(start_coord, goal_coord, field_input, edges_dict)
 		self.g_value[self.start] = 0
-		super()._init()
+		self._set_priority_value(self.start)
 		
 	def _calculate_priority_value(self, cell: Cell) -> (int, int):
 		g_value = self._get_g_value(cell)

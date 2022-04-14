@@ -17,8 +17,8 @@ class Lifelong_a_star(Path_planning_algorithm):
 		self.rhs_value = dict()
 		super().__init__(start_coord, goal_coord, field_input, edges_dict)
 		self.rhs_value[self.start] = 0
-		super()._init()
-
+		self._set_priority_value(self.start)
+		
 	def _calculate_priority_value(self, cell: Cell) -> (int, int):
 		min_value = min(self._get_rhs_value(cell), self._get_g_value(cell))
 		return (min_value + self._get_heuristic_value(cell), min_value)
@@ -48,7 +48,7 @@ class Lifelong_a_star(Path_planning_algorithm):
 		 		for next_cell in self.field.get_neigbours(current_cell):
 		 			self._update_cell(next_cell)
 		 	else:
-		 		self.g_value[current_cell] = INFINITY
+		 		self.g_value[current_cell] = self.INFINITY
 		 		for next_cell in self.field.get_neigbours(current_cell) + [current_cell]:
 		 			self._update_cell(next_cell)
 		return self._get_g_value(self.goal)  

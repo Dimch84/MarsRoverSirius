@@ -31,7 +31,7 @@ class Draw(Frame):
         mars_rover_coordinate_y = map.start_point[0]
         mars_rover_coordinate_x = map.start_point[1]
         for step in map.mars_rover_path:
-            
+
             new_mars_rover_coordinate_y = mars_rover_coordinate_y
             new_mars_rover_coordinate_x = mars_rover_coordinate_x
             
@@ -45,6 +45,7 @@ class Draw(Frame):
             if step == 'L':
                 new_mars_rover_coordinate_x -= 1
 
+
             canvas.create_line(
                             mars_rover_coordinate_x * map.size_cell + map.size_cell // 2,
                             mars_rover_coordinate_y * map.size_cell + map.size_cell // 2,
@@ -52,6 +53,7 @@ class Draw(Frame):
                             new_mars_rover_coordinate_y * map.size_cell + map.size_cell // 2,
                             arrow = 'last',
                             dash = (5, 2))
+
 
 
             mars_rover_coordinate_x = new_mars_rover_coordinate_x
@@ -198,3 +200,4 @@ def map_drawing (map : Map) -> None:
     ex = Draw(map)
 
     root.mainloop()
+

@@ -18,20 +18,13 @@ class Draw(Frame):
 
         self.draw_map (map, canvas)
         self.draw_path (map, canvas)
-        self.animation (map, canvas)
 
-    def initUI_dark_mod(self, map : Map):
+        if map.radius == -1:
+            self.animation (map, canvas)
+        else:
+            self.animation_with_dawn (map, canvas)
 
-        self.master.title("Map (dark mode)")
-        self.pack(fill = 'both', expand = 1)
-
-        canvas = Canvas(self)
-        canvas.pack(fill = 'both', expand = 1)
-
-        self.draw_map (map, canvas)
-        self.draw_path (map, canvas)
-        self.animation_with_dawn (map, canvas)
-
+    
     def draw_path (self, map : Map, canvas : Canvas) -> None:
         
         # drawing movement Mars rover

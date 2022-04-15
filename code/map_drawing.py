@@ -1,65 +1,37 @@
-import pygame
+from tkinter import Tk, Canvas, Frame
 
-def map_drawing (n: int, m: int, map: list,
-                 start_point: list, finish_point: list, 
-                 mars_rover_path: str) -> None:
+from map import Map
 
-    if n == 0 or m == 0:
-        print ("Error: invalid map size")
-        return
+class Draw(Frame):
+ 
+    def __init__(self, map : Map):
+        super().__init__()
+        self.initUI(map)
 
-    max_size_screen_side = 800
-    size_cell = max_size_screen_side // max (n, m)
+    def initUI(self, map : Map):
 
-    # init screen 
-    pygame.init()
-    screen = pygame.display.set_mode((size_cell * m, size_cell * n))
+        self.master.title("Map")
+        self.pack(fill = 'both', expand = 1)
 
-    pygame.display.update()
-    pygame.display.set_caption('Mars rover movement')
-    
-    # text style
-    words_font = pygame.font.SysFont("comicsansms", 35)
+        canvas = Canvas(self)
+        canvas.pack(fill = 'both', expand = 1)
 
-    # color
-    obstacle_color = (149, 163, 0)
-    background_color = (241, 253, 114)
-    text_color = (106, 35, 126)
-    color_path = (187, 99, 212)
+        self.draw_map (map, canvas)
+        self.draw_path (map, canvas)
+
+        if map.radius == -1:
+            self.animation (map, canvas)
+        else:
+            self.animation_with_dawn (map, canvas)
 
     
-    #drawing screen
-    show_screen = False
-    while not show_screen:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                show_screen = True
-    
-        # drawing map
-        for i in range(n):
-            for j in range (m):
-
-                if map[i][j] == 1:
-                    color = obstacle_color
-                else:
-                    color = background_color
-
-                pygame.draw.rect(screen, color, [j * size_cell, i * size_cell,
-                                 size_cell, size_cell])
+    def draw_path (self, map : Map, canvas : Canvas) -> None:
         
-        
-        #out start and finish
-        screen.blit(words_font.render("start", True, text_color),
-                    dest = (size_cell * start_point[1], size_cell * start_point[0]))
-        screen.blit(words_font.render("finish", True, text_color),
-                    dest = (size_cell * finish_point[1], size_cell * finish_point[0]))
-
-
         # drawing movement Mars rover
-        mars_rover_coordinate_y = start_point[0]
-        mars_rover_coordinate_x = start_point[1]
-        for step in mars_rover_path:
-            
+        mars_rover_coordinate_y = map.start_point[0]
+        mars_rover_coordinate_x = map.start_point[1]
+        for step in map.mars_rover_path:
+
             new_mars_rover_coordinate_y = mars_rover_coordinate_y
             new_mars_rover_coordinate_x = mars_rover_coordinate_x
             
@@ -73,25 +45,159 @@ def map_drawing (n: int, m: int, map: list,
             if step == 'L':
                 new_mars_rover_coordinate_x -= 1
 
-            pygame.draw.line(screen, color_path, 
-                            (mars_rover_coordinate_x * size_cell + size_cell // 2,
-                            mars_rover_coordinate_y * size_cell + size_cell // 2),
-                            (new_mars_rover_coordinate_x * size_cell + size_cell // 2,
-                            new_mars_rover_coordinate_y * size_cell + size_cell // 2),
-                            5)
+
+            canvas.create_line(
+                            mars_rover_coordinate_x * map.size_cell + map.size_cell // 2,
+                            mars_rover_coordinate_y * map.size_cell + map.size_cell // 2,
+                            new_mars_rover_coordinate_x * map.size_cell + map.size_cell // 2,
+                            new_mars_rover_coordinate_y * map.size_cell + map.size_cell // 2,
+                            arrow = 'last',
+                            dash = (5, 2))
+
 
 
             mars_rover_coordinate_x = new_mars_rover_coordinate_x
             mars_rover_coordinate_y = new_mars_rover_coordinate_y
 
 
-        pygame.display.update()
+        #out start and finish
+        canvas.create_text(map.size_cell * map.start_point[1] + map.size_cell // 2, 
+                            map.size_cell * map.start_point[0] + map.size_cell // 2,
+                            text = 'START',
+                            justify = 'center')
+        canvas.create_text(map.size_cell * map.finish_point[1] + map.size_cell // 2, 
+                            map.size_cell * map.finish_point[0] + map.size_cell // 2,
+                            text = 'FINISH',
+                            justify = 'center')
 
-    pygame.quit()
-    quit()
+    def draw_map (self, map : Map, canvas : Canvas) -> None:
+        # draw cell
+        for i in range (map.m):
+            for j in range (map.n):
+
+                color_cell = 'lavender'
+                if map.map[j][i] == 1:
+                    color_cell = 'gray'
+
+                canvas.create_rectangle(
+                        map.size_cell * i, map.size_cell * j,
+                        map.size_cell * (i + 1), map.size_cell * (j + 1),
+                        outline = 'black', fill = color_cell, width = 1)
+
+    def animation (self, map : Map, canvas : Canvas) -> None:
+        # animation
+        
+        mars_rover_coordinate_y = mars_rover_coordinate_x = 1
+
+        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
+                                        map.size_cell // 4, 
+                                        map.start_point[0] * map.size_cell + 
+                                        map.size_cell // 4,
+                                        (map.start_point[1] + 1) * map.size_cell - 
+                                        map.size_cell // 4,
+                                        (map.start_point[0] + 1) * map.size_cell -
+                                        map.size_cell // 4,
+                                        outline = 'black', 
+                                        fill = 'black', 
+                                        width = 1)
+
+        
+
+        for step in map.mars_rover_path:
+            # next coordinate
+            if step == 'U':
+                mars_rover_coordinate_y = -1
+                mars_rover_coordinate_x = 0
+            if step == 'D':
+                mars_rover_coordinate_y = 1
+                mars_rover_coordinate_x = 0
+            if step == 'R':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = 1
+            if step == 'L':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = -1
+
+            #animation
+            for i in range (map.size_cell):
+
+                canvas.move(rover, 
+                            mars_rover_coordinate_x, 
+                            mars_rover_coordinate_y)
+                self.update()
+                canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
+
+    def animation_with_dawn (self, map : Map, canvas : Canvas) -> None:
+        
+        mars_rover_coordinate_y = mars_rover_coordinate_x = 1
+
+        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
+                                        map.size_cell // 4, 
+                                        map.start_point[0] * map.size_cell + 
+                                        map.size_cell // 4,
+                                        (map.start_point[1] + 1) * map.size_cell - 
+                                        map.size_cell // 4,
+                                        (map.start_point[0] + 1) * map.size_cell -
+                                        map.size_cell // 4,
+                                        outline = 'black', 
+                                        fill = 'black', 
+                                        width = 1)
 
 
-# exemple
-# map_drawing(4, 7, 
-#            [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
-#            (3, 0), (3, 3), 'RUURRRRDDLL')
+        # black_zone
+        black_lines = []
+        
+        for x in range (-map.m, 2 * map.m):
+            for y in range (-map.n, 2 * map.n):
+                if abs(x - map.start_point[1]) + abs(y - map.start_point[0]) > map.radius:
+                    black_lines.append(
+                        canvas.create_rectangle(
+                                x * map.size_cell,
+                                y * map.size_cell,
+                                (x + 1) * map.size_cell,
+                                (y + 1) * map.size_cell,
+                                fill = 'black',
+                                ))
+
+        for step in map.mars_rover_path:
+            # next coordinate
+            if step == 'U':
+                mars_rover_coordinate_y = -1
+                mars_rover_coordinate_x = 0
+            if step == 'D':
+                mars_rover_coordinate_y = 1
+                mars_rover_coordinate_x = 0
+            if step == 'R':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = 1
+            if step == 'L':
+                mars_rover_coordinate_y = 0
+                mars_rover_coordinate_x = -1
+
+            #animation
+            for i in range (map.size_cell):
+
+                canvas.move(rover, 
+                            mars_rover_coordinate_x, 
+                            mars_rover_coordinate_y)
+
+                for black_line in black_lines: 
+                    canvas.move(black_line,
+                                mars_rover_coordinate_x, 
+                                mars_rover_coordinate_y)
+
+                self.update()
+                canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
+
+
+def map_drawing (map : Map) -> None:
+
+    # init screen 
+    root = Tk()
+    root.title("Map drawing")
+    root.geometry("{0}x{1}+0+0".format(
+                    map.width + 1, map.height + 1))
+    ex = Draw(map)
+
+    root.mainloop()
+

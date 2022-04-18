@@ -40,6 +40,7 @@ class UI(Frame):
         self.__save_button = Button()
         self.__load_button = Button()
         self.__random_button = Button()
+        self.__change_mode_button = Button()
         self.__new_button = Button()
         self.__exit_button = Button()
         self.__file_format = StringVar()
@@ -54,6 +55,7 @@ class UI(Frame):
         self.__configure_save_button()
         self.__configure_load_button()
         self.__configure_random_button()
+        self.__configure_change_mode_button()
         self.__configure_new_button()
         self.__configure_exit_button()
         self.__configure_file_format_menu()
@@ -87,6 +89,16 @@ class UI(Frame):
         self.__configure_button(self.__random_button)
         self.__random_button.config(text='Randomise',
                                     command=self.__generate_random)
+
+    def __configure_change_mode_button(self) -> None:
+        """
+        This method configures the 'change mode' button.
+
+        :return:
+        """
+        self.__configure_button(self.__random_button)
+        self.__random_button.config(text='Change mode',
+                                    command=self.__field.change_mode)
 
     def __configure_new_button(self) -> None:
         """

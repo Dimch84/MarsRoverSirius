@@ -96,6 +96,19 @@ class Square:
             self.__canvas.itemconfig(self.__square_id,
                                      fill=color, outline=color)
 
+    def delete(self) -> None:
+        """
+        This method deletes this square.
+
+        :return:
+        """
+        if self.__square_id is not None:
+            self.__canvas.delete(self.__square_id)
+        self.square_type = SquareType.FREE
+        self.size = 0
+        self.position = (0, 0)
+        self.__square_id = None
+
     def get_coordinates(self) -> tuple:
         """
         This method returns the position of the top left and bottom right
@@ -136,12 +149,15 @@ class Field(Frame):
     __left_shift = 0
     __up_shift = 0
     __start_position = (0, 0)
+    __start_square = None
     __finish_position = (0, 0)
+    __finish_square = None
     __area_start = (0, 0)
     __area = None
     __alt_pressed = False
     __shift_pressed = False
     __current_type = SquareType.FREE
+    __editor_mode = True
 
     def __init__(self, width: int = 10, height: int = 10,
                  density: float = 0.5) -> None:
@@ -153,7 +169,8 @@ class Field(Frame):
         self.__canvas = Canvas(self)
         self.pack(fill=BOTH, side=TOP, expand=1)
         self.__canvas.pack(fill=BOTH, expand=1)
-        self.__add_binds()
+        self.__add_common_binds()
+        self.__add_editor_binds()
         self.reset()
 
     def generate_random(self) -> None:
@@ -165,10 +182,8 @@ class Field(Frame):
         self.reset()
         start_row = randrange(self.__height)
         start_col = randrange(self.__width)
-        self.__change_special_square(start_row, start_col, SquareType.START)
         finish_row = randrange(self.__height)
         finish_col = randrange(self.__width)
-        self.__change_special_square(finish_row, finish_col, SquareType.FINISH)
         for row, col in product(range(self.__height), range(self.__width)):
             if row == start_row and col == start_col or \
                     row == finish_row and col == finish_col:
@@ -307,10 +322,36 @@ class Field(Frame):
                              for _ in range(self.__height)]
         self.__start_position = (0, 0)
         self.__finish_position = (0, 0)
-        self.__field_data[0][0].change_type(SquareType.FINISH)
         self.__draw()
 
-    def get_frame_width(self) -> int:
+    def change_mode(self) -> None:
+        """
+        Changes mode to editor and back.
+
+        :return:
+        """
+        self.__remove_binds()
+        if self.__editor_mode:
+            self.__editor_mode = False
+            self.__add_other_binds()
+            self.__start_square = \
+                Square(self.__canvas, SquareType.START, self.__square_size,
+                       self.__get_position_from_index(*self.__start_position))
+            self.__start_square.draw()
+            self.__finish_square = \
+                Square(self.__canvas, SquareType.FINISH, self.__square_size,
+                       self.__get_position_from_index(*self.__finish_position))
+            self.__finish_square.draw()
+        else:
+            self.__editor_mode = True
+            self.__add_editor_binds()
+            self.__start_square.delete()
+            self.__start_square = None
+            self.__finish_square.delete()
+            self.__finish_square = None
+            self.__current_type = SquareType.FREE
+
+    def __get_frame_width(self) -> int:
         """
         This method returns the width of the field on the screen.
 
@@ -319,7 +360,7 @@ class Field(Frame):
         self.update()
         return self.winfo_width()
 
-    def get_frame_height(self) -> int:
+    def __get_frame_height(self) -> int:
         """
         This method returns the height of the field on the screen.
 
@@ -337,9 +378,21 @@ class Field(Frame):
         for row, col in product(range(self.__height), range(self.__width)):
             self.__draw_square(row, col)
 
-    def __add_binds(self) -> None:
+    def __add_common_binds(self) -> None:
         """
-        This method adds binds to this class to process user input.
+        This method adds binds to this class to process user input, not
+        depending on the current mode.
+
+        :return:
+        """
+        self.focus_set()
+        self.bind('<KeyPress>', self.__process_key_press)
+        self.bind('<KeyRelease>', self.__process_key_release)
+
+    def __add_editor_binds(self) -> None:
+        """
+        This method adds binds to this class to process user input in the
+        editor mode.
 
         :return:
         """
@@ -348,9 +401,30 @@ class Field(Frame):
         self.__canvas.bind('<Button-2>', self.__set_area_start)
         self.__canvas.bind('<B2-Motion>', self.__select_area)
         self.__canvas.bind('<ButtonRelease-2>', self.__change_area)
-        self.focus_set()
-        self.bind('<KeyPress>', self.__process_key_press)
-        self.bind('<KeyRelease>', self.__process_key_release)
+
+    def __add_other_binds(self) -> None:
+        """
+        This method adds binds to this class to process user input when not in
+        the editor mode.
+
+        :return:
+        """
+        self.__canvas.bind('<Button-1>', self.__change_start)
+        self.__canvas.bind('<B1-Motion>', self.__change_start)
+        self.__canvas.bind('<Button-2>', self.__change_finish)
+        self.__canvas.bind('<B2-Motion>', self.__change_finish)
+
+    def __remove_binds(self) -> None:
+        """
+        This method removes oll binds that depend on the current mode.
+
+        :return:
+        """
+        self.__canvas.unbind('<Button-1>')
+        self.__canvas.unbind('<B1-Motion>')
+        self.__canvas.unbind('<Button-2>')
+        self.__canvas.unbind('<B2-Motion>')
+        self.__canvas.unbind('<ButtonRelease-2>')
 
     @staticmethod
     def __check_file(file_name: str) -> bool:
@@ -375,11 +449,7 @@ class Field(Frame):
         :return:
         """
         key = event.keysym
-        if key == 'Alt_L' or key == 'Alt_R':
-            self.__alt_pressed = True
-        elif key == 'Shift_L' or key == 'Shift_R':
-            self.__shift_pressed = True
-        elif key == 'plus':
+        if key == 'plus':
             self.__zoom_in()
         elif key == 'minus':
             self.__zoom_out()
@@ -499,63 +569,22 @@ class Field(Frame):
         :param event: tkinter event.
         :return:
         """
-        row, col = self.__get_index_from_coordinates(event.x, event.y)
+        row, col = self.__get_index_from_position(event.x, event.y)
         if row < 0 or row >= self.__height:
             return
         if col < 0 or col >= self.__width:
             return
-        if self.__alt_pressed:
-            self.__change_special_square(row, col, SquareType.START)
-        elif self.__shift_pressed:
-            self.__change_special_square(row, col, SquareType.FINISH)
-        else:
-            self.__change_normal_square(row, col)
+        self.__field_data[row][col].change_type(self.__current_type)
 
-    def __change_normal_square(self, row_index: int, col_index: int) -> None:
-        """
-        This method changes a square to the current chosen type if it is not
-        the start or the finish.
+    def __change_start(self, event: Event) -> None:
+        self.__start_position = self.__get_index_from_position(event.x, event.y)
+        position = self.__get_position_from_index(*self.__start_position)
+        self.__start_square.draw(self.__square_size, position)
 
-        :param row_index: row index.
-        :param col_index: column index.
-        :return:
-        """
-        square = self.__field_data[row_index][col_index]
-        if square.square_type == SquareType.START or \
-                square.square_type == SquareType.FINISH:
-            return
-        square.change_type(self.__current_type)
-
-    def __change_special_square(self, row_index: int, col_index: int,
-                                square_type: SquareType) -> None:
-        """
-        This method changes the position of the start or the finish.
-
-        :param row_index: new row index.
-        :param col_index: new column index.
-        :param square_type: start or finish.
-        :return:
-        """
-        if self.__field_data[row_index][col_index].square_type == square_type:
-            return
-        if square_type == SquareType.START:
-            old_row = self.__start_position[0]
-            old_col = self.__start_position[1]
-            self.__start_position = (row_index, col_index)
-        elif square_type == SquareType.FINISH:
-            old_row = self.__finish_position[0]
-            old_col = self.__finish_position[1]
-            self.__finish_position = (row_index, col_index)
-        else:
-            return
-        start_row, start_col = self.__start_position
-        finish_row, finish_col = self.__finish_position
-        self.__field_data[old_row][old_col]. \
-            change_type(SquareType.FREE)
-        self.__field_data[start_row][start_col]. \
-            change_type(SquareType.START)
-        self.__field_data[finish_row][finish_col]. \
-            change_type(SquareType.FINISH)
+    def __change_finish(self, event: Event) -> None:
+        self.__finish_position = self.__get_index_from_position(event.x, event.y)
+        position = self.__get_position_from_index(*self.__finish_position)
+        self.__finish_square.draw(self.__square_size, position)
 
     def __set_area_start(self, event: Event) -> None:
         """
@@ -594,9 +623,9 @@ class Field(Frame):
         :return:
         """
         finish_row, finish_col = \
-            self.__get_index_from_coordinates(event.x, event.y)
+            self.__get_index_from_position(event.x, event.y)
         start_row, start_col = \
-            self.__get_index_from_coordinates(*self.__area_start)
+            self.__get_index_from_position(*self.__area_start)
         if start_row > finish_row:
             start_row, finish_row = finish_row, start_row
         if start_col > finish_col:
@@ -605,7 +634,7 @@ class Field(Frame):
         finish_col = min(self.__width, finish_col)
         for row, col in product(range(start_row, finish_row + 1),
                                 range(start_col, finish_col + 1)):
-            self.__change_normal_square(row, col)
+            self.__field_data[row][col].change_type(self.__current_type)
         self.__canvas.delete(self.__area)
         self.__area = None
 
@@ -617,12 +646,9 @@ class Field(Frame):
         :param col_index: column index.
         :return:
         """
-        x0 = self.__padding + \
-            (col_index - self.__left_shift) * self.__square_size
-        y0 = self.__padding + \
-            (row_index - self.__up_shift) * self.__square_size
         self.__field_data[row_index][col_index] \
-            .draw(self.__square_size, (x0, y0))
+            .draw(self.__square_size,
+                  self.__get_position_from_index(row_index, col_index))
 
     def __get_width_in_squares(self) -> int:
         """
@@ -631,7 +657,7 @@ class Field(Frame):
 
         :return: the number of squares.
         """
-        return self.get_frame_width() // self.__square_size + 1
+        return self.__get_frame_width() // self.__square_size + 1
 
     def __get_height_in_squares(self) -> int:
         """
@@ -640,20 +666,54 @@ class Field(Frame):
 
         :return: the number of squares.
         """
-        return self.get_frame_height() // self.__square_size + 1
+        return self.__get_frame_height() // self.__square_size + 1
 
-    def __get_index_from_coordinates(self, x: int, y: int) -> tuple:
+    def __get_position_from_index(self, row_index: int, col_index: int) -> tuple:
+        """
+        This method returns coordinates of the top left point of the square
+        given its row and column indices.
+
+        :param row_index: index of the row of the square.
+        :param col_index: index of the column of the square.
+        :return: coordinates of the top left point of the square.
+        """
+        row_index, col_index = self.__limit_indices(row_index, col_index)
+        x = self.__padding + \
+            (col_index - self.__left_shift) * self.__square_size
+        y = self.__padding + \
+            (row_index - self.__up_shift) * self.__square_size
+        return x, y
+
+    def __get_index_from_position(self, x: int, y: int) -> tuple:
         """
         This method returns a row and a column of a square given coordinates of
         its inside point.
 
         :param x: x coordinate of the square.
         :param y: y coordinate of the square.
-        :return: indices of the row and the column.
+        :return: indices of the row and the column of the square.
         """
         row_index = (y - self.__padding) // \
             self.__square_size + self.__up_shift
         col_index = (x - self.__padding) // \
             self.__square_size + self.__left_shift
-        return min(row_index, self.__height - 1), \
-            min(col_index, self.__width - 1)
+        row_index, col_index = self.__limit_indices(row_index, col_index)
+        return row_index, col_index
+
+    def __limit_indices(self, row_index: int, col_index: int) -> tuple:
+        """
+        This method makes given indices fit inside the field.
+
+        :param row_index: index of the row.
+        :param col_index: index of the column.
+        :return: limited indices.
+        """
+        if row_index >= self.__height:
+            row_index = self.__height - 1
+        if row_index < 0:
+            row_index = 0
+        if col_index >= self.__width:
+            col_index = self.__width - 1
+        if col_index < 0:
+            col_index = 0
+        return row_index, col_index

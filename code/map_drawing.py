@@ -1,16 +1,20 @@
-from tkinter import Tk, Canvas, Frame
+from tkinter import *
 
 from map import Map
 
-class Draw(Frame):
+class draw(Frame):
  
-    def __init__(self, map : Map):
-        super().__init__()
-        self.initUI(map)
+    def __init__(self, master, map : Map):
+        self.slave = Toplevel(master)
+        self.slave.title('Map drawing')
+        self.slave.geometry("{0}x{1}+0+0".format(
+                           map.width + 1, map.height + 1))
+
+        #self.super().__init__()
+        #self.initUI(map)
 
     def initUI(self, map : Map):
 
-        self.master.title("Map")
         self.pack(fill = 'both', expand = 1)
 
         canvas = Canvas(self)
@@ -190,14 +194,13 @@ class Draw(Frame):
                 canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
 
 
-def map_drawing (map : Map) -> None:
+#def map_drawing (map : Map) -> None:
 
     # init screen 
-    root = Tk()
-    root.title("Map drawing")
-    root.geometry("{0}x{1}+0+0".format(
-                    map.width + 1, map.height + 1))
-    ex = Draw(map)
+    # root = Tk()
+    # root.title("Map drawing")
+    # root.geometry("{0}x{1}+0+0".format(
+    #                 map.width + 1, map.height + 1))
+    #ex = Draw(map)
 
-    root.mainloop()
-
+    # root.mainloop()

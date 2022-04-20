@@ -4,7 +4,7 @@ from itertools import product
 from json import dump, load
 from os.path import exists
 from random import random, randrange
-from tkinter import BOTH, Canvas, Event, Frame, TOP
+from tkinter import BOTH, Canvas, Event, Frame, Misc, TOP
 
 
 class SquareType(IntEnum):
@@ -159,19 +159,15 @@ class Field(Frame):
     __current_type = SquareType.FREE
     __editor_mode = True
 
-    def __init__(self, width: int = 10, height: int = 10,
+    def __init__(self, master: Misc, width: int = 10, height: int = 10,
                  density: float = 0.5) -> None:
-        super().__init__()
+        super().__init__(master)
         self.__width = width
         self.__height = height
         self.__density = density
         self.__field_data = []
         self.__canvas = Canvas(self)
-        self.pack(fill=BOTH, side=TOP, expand=1)
-        self.__canvas.pack(fill=BOTH, expand=1)
-        self.__add_common_binds()
-        self.__add_editor_binds()
-        self.reset()
+        self.__configure()
 
     def generate_random(self) -> None:
         """
@@ -351,23 +347,12 @@ class Field(Frame):
             self.__finish_square = None
             self.__current_type = SquareType.FREE
 
-    def __get_frame_width(self) -> int:
-        """
-        This method returns the width of the field on the screen.
-
-        :return: field frame width.
-        """
-        self.update()
-        return self.winfo_width()
-
-    def __get_frame_height(self) -> int:
-        """
-        This method returns the height of the field on the screen.
-
-        :return: field frame height.
-        """
-        self.update()
-        return self.winfo_height()
+    def __configure(self):
+        self.pack(fill=BOTH, side=TOP, expand=1)
+        self.__canvas.pack(fill=BOTH, expand=1)
+        self.__add_common_binds()
+        self.__add_editor_binds()
+        self.reset()
 
     def __draw(self) -> None:
         """
@@ -577,11 +562,25 @@ class Field(Frame):
         self.__field_data[row][col].change_type(self.__current_type)
 
     def __change_start(self, event: Event) -> None:
+        """
+        This method changes the position of the start square, it should be used
+        in widget.bind.
+
+        :param event: tkinter event.
+        :return:
+        """
         self.__start_position = self.__get_index_from_position(event.x, event.y)
         position = self.__get_position_from_index(*self.__start_position)
         self.__start_square.draw(self.__square_size, position)
 
     def __change_finish(self, event: Event) -> None:
+        """
+        This method changes the position of the finish square, it should be
+        used in widget.bind.
+
+        :param event: tkinter event.
+        :return:
+        """
         self.__finish_position = self.__get_index_from_position(event.x, event.y)
         position = self.__get_position_from_index(*self.__finish_position)
         self.__finish_square.draw(self.__square_size, position)
@@ -649,24 +648,6 @@ class Field(Frame):
         self.__field_data[row_index][col_index] \
             .draw(self.__square_size,
                   self.__get_position_from_index(row_index, col_index))
-
-    def __get_width_in_squares(self) -> int:
-        """
-        This method returns the number of squares that would be enough to cover
-        the frame horizontally.
-
-        :return: the number of squares.
-        """
-        return self.__get_frame_width() // self.__square_size + 1
-
-    def __get_height_in_squares(self) -> int:
-        """
-        This method returns the number of squares that would be enough to cover
-        the frame vertically.
-
-        :return: the number of squares.
-        """
-        return self.__get_frame_height() // self.__square_size + 1
 
     def __get_position_from_index(self, row_index: int, col_index: int) -> tuple:
         """

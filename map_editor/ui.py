@@ -1,11 +1,11 @@
 from tkinter import BOTH, BOTTOM, Button, Frame, \
-    Label, LEFT, OptionMenu, StringVar, Tk
+    Label, LEFT, Misc, OptionMenu, StringVar
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesno
 from tkinter.simpledialog import askinteger
 from enum import Enum
 
-from field import Field
+from map_editor.field import Field
 
 
 class FileTypes(Enum):
@@ -32,17 +32,17 @@ class UI(Frame):
     """
     __button_height = 5
 
-    def __init__(self, root: Tk, field: Field) -> None:
-        super().__init__()
-        self.__root = root
+    def __init__(self, master: Misc, field: Field) -> None:
+        super().__init__(master)
+        self.__master = master
         self.__field = field
         self.pack(fill=BOTH, side=BOTTOM, expand=0)
-        self.__save_button = Button()
-        self.__load_button = Button()
-        self.__random_button = Button()
-        self.__change_mode_button = Button()
-        self.__new_button = Button()
-        self.__exit_button = Button()
+        self.__save_button = Button(master)
+        self.__load_button = Button(master)
+        self.__random_button = Button(master)
+        self.__change_mode_button = Button(master)
+        self.__new_button = Button(master)
+        self.__exit_button = Button(master)
         self.__file_format = StringVar()
         self.__configure()
 
@@ -226,4 +226,4 @@ class UI(Frame):
                              '(current map will not be saved)?')
         if not confirmed:
             return
-        self.__root.destroy()
+        self.__master.destroy()

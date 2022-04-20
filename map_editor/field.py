@@ -575,7 +575,8 @@ class Field(Frame):
         :param event: tkinter event.
         :return:
         """
-        self.__start_position = self.__get_index_from_position(event.x, event.y)
+        self.__start_position = self.__limit_indices(
+            *self.__get_index_from_position(event.x, event.y))
         position = self.__get_position_from_index(*self.__start_position)
         self.__start_square.draw(self.__square_size, position)
 
@@ -587,7 +588,8 @@ class Field(Frame):
         :param event: tkinter event.
         :return:
         """
-        self.__finish_position = self.__get_index_from_position(event.x, event.y)
+        self.__finish_position = self.__limit_indices(
+            *self.__get_index_from_position(event.x, event.y))
         position = self.__get_position_from_index(*self.__finish_position)
         self.__finish_square.draw(self.__square_size, position)
 
@@ -635,8 +637,13 @@ class Field(Frame):
             start_row, finish_row = finish_row, start_row
         if start_col > finish_col:
             start_col, finish_col = finish_col, start_col
-        finish_row = min(self.__height, finish_row)
-        finish_col = min(self.__width, finish_col)
+        if start_row >= self.__height or finish_row < 0 or \
+                start_col >= self.__width or finish_col < 0:
+            self.__canvas.delete(self.__area)
+            self.__area = None
+            return
+        finish_row, finish_col = self.__limit_indices(finish_row, finish_col)
+        start_row, start_col = self.__limit_indices(start_row, start_col)
         for row, col in product(range(start_row, finish_row + 1),
                                 range(start_col, finish_col + 1)):
             self.__field_data[row][col].change_type(self.__current_type)
@@ -664,7 +671,6 @@ class Field(Frame):
         :param col_index: index of the column of the square.
         :return: coordinates of the top left point of the square.
         """
-        row_index, col_index = self.__limit_indices(row_index, col_index)
         x = self.__padding + \
             (col_index - self.__left_shift) * self.__square_size
         y = self.__padding + \
@@ -684,7 +690,6 @@ class Field(Frame):
             self.__square_size + self.__up_shift
         col_index = (x - self.__padding) // \
             self.__square_size + self.__left_shift
-        row_index, col_index = self.__limit_indices(row_index, col_index)
         return row_index, col_index
 
     def __limit_indices(self, row_index: int, col_index: int) -> tuple:

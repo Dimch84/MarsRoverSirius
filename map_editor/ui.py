@@ -27,7 +27,7 @@ class UI(Frame):
     """
     This class provides user interface.
 
-    :param root: the main tkinter widget.
+    :param master: the master tkinter widget.
     :param field: the field to which this ui should be attached.
     """
     __button_height = 5

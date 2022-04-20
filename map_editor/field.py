@@ -136,6 +136,7 @@ class Field(Frame):
     This class provides methods for generating a field and drawing it on the
     screen.
 
+    :param master: the master tkinter widget.
     :param width: the width of the field in squares.
     :param height: the height of the field in squares.
     :param density: the likelihood of a square to be blocked.
@@ -347,7 +348,12 @@ class Field(Frame):
             self.__finish_square = None
             self.__current_type = SquareType.FREE
 
-    def __configure(self):
+    def __configure(self) -> None:
+        """
+        This method does initial configuration for this widget.
+
+        :return:
+        """
         self.pack(fill=BOTH, side=TOP, expand=1)
         self.__canvas.pack(fill=BOTH, expand=1)
         self.__add_common_binds()

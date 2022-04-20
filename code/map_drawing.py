@@ -10,14 +10,12 @@ class draw(Frame):
         self.slave.geometry("{0}x{1}+0+0".format(
                            map.width + 1, map.height + 1))
 
-        #self.super().__init__()
-        #self.initUI(map)
+        super().__init__()
+        self.initUI(map)
 
     def initUI(self, map : Map):
 
-        self.pack(fill = 'both', expand = 1)
-
-        canvas = Canvas(self)
+        canvas = Canvas(self.slave)
         canvas.pack(fill = 'both', expand = 1)
 
         self.draw_map (map, canvas)

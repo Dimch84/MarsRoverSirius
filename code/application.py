@@ -9,6 +9,7 @@ class Application:
         self.master = master
         self.master.geometry("1000x1000")
         self.master.title('Menu')
+        self.master.bind_all('<Destroy>', self.on_destroy)
 
         self.button_exit = Button(self.master, 
                    text ="EXIT", 
@@ -51,6 +52,9 @@ class Application:
 
         self.master.mainloop()
 
+    def on_destroy(self, event):
+        self.master.deiconify()
+
     def exit(self):
         exit()
 
@@ -59,6 +63,7 @@ class Application:
         # TODO 
 
     def map (self):
+        self.master.withdraw()
         draw(self.master, Map(4, 7, 
             [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
             (3, 0), (3, 3), 'RUURRRRDDLL', -1))

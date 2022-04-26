@@ -11,40 +11,9 @@ class draw(Frame):
                            map.width + 1, map.height + 1 + 100))
 
         super().__init__()
-        canvas = self.initUI(map)
+        self.initUI(map)
 
-        self.b = Button(self.slave, 
-                   text ="EXIT",
-                   bg = 'thistle2',
-                   command = self.exit,
-                   activebackground = 'thistle1')
-
-        self.b.place(x = 350,
-                y = map.height + 5, 
-                height = 90, 
-                width = 300, 
-                bordermode='outside')
-
-        self.b = Button(self.slave, 
-                   text ="RESTART",
-                   bg = 'thistle2',
-                #    command = self.start_drawing(map, canvas),
-                   activebackground = 'thistle1')
-
-        self.b.place(x = 10,
-                y = map.height + 5, 
-                height = 90, 
-                width = 300, 
-                bordermode='outside')
-
-
-    def start_drawing (self, map : Map, canvas : Canvas):
-        self.animation (map, canvas)
-
-    def exit(self):
-        self.slave.quit()
-
-    def initUI(self, map : Map) -> Canvas:
+    def initUI(self, map : Map) -> None:
 
         canvas = Canvas(self.slave)
         canvas.pack(fill = 'both', expand = 1)
@@ -56,8 +25,6 @@ class draw(Frame):
             self.animation (map, canvas)
         else:
             self.animation_with_dawn (map, canvas)
-
-        return canvas
 
     
     def draw_path (self, map : Map, canvas : Canvas) -> None:

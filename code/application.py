@@ -1,7 +1,10 @@
 from tkinter import *
 
+from tkinter.filedialog import askopenfilename
+
 from map import Map
 from map_drawing import draw
+from editor import Editor
 
 class Application:
  
@@ -25,7 +28,7 @@ class Application:
 
         self.button = Button(self.master, 
                    text ="MAP", 
-                   command = self.map,
+                   command = self.draw_map,
                    bg = 'thistle2',
                    activebackground = 'thistle1')
 
@@ -55,14 +58,19 @@ class Application:
         self.master.quit()
 
     def make_map(self):
-        print(':)')
-        # TODO 
+        Editor(self.master)
 
-    def map (self):
-        draw(self.master, Map(4, 7, 
-            [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
-            (3, 0), (3, 3), 'RUURRRRDDLL', -1))
-		# TODO
+    def draw_map (self):
+
+        file_name = askopenfilename()
+        
+        # TODO
+        
+        # launch example
+        # draw(self.master, Map(4, 7, 
+        #     [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
+        #     (3, 0), (3, 3), 'RUURRRRDDLL', -1))
+		
 		
 
 root = Tk()

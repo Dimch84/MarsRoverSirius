@@ -1,5 +1,6 @@
 import os, sys
 from tkinter import *
+from json import load
 
 from tkinter.filedialog import askopenfilename
 
@@ -7,6 +8,9 @@ from map import Map
 from map_drawing import draw
 
 sys.path.insert(1, os.path.join(sys.path[0], '../map_editor'))
+sys.path.insert(1, os.path.join(sys.path[0], '../src'))
+ 
+from a_star import A_star
 from editor import Editor
 
 class Application:
@@ -69,10 +73,24 @@ class Application:
 
     def draw_map (self):
 
+        def get_direction_path(path: [(int, int)]) -> [(int, int)]:
+            direction_path = []
+            for i in range(len(path[:-1])):
+                current_cell, next_cell = path[i], path[i + 1]
+                direction_path.append((next_cell[0] - current_cell[0], next_cell[1] - current_cell[1]))
+            return direction_path
+
         self.master.withdraw()
         file_name = askopenfilename()
-        
-        # TODO
+        with open(file_name, 'r') as file:
+            field_data = load(file)
+        start = field_data['start']
+        goal = field_data['finish']
+        field = field_data['field']
+ 
+        path_length, path = A_star.call(start, goal, field)
+        direction_path = get_direction_path(path) # путь из дельт
+        # print(path, direction_path)
         
         # launch example
         # draw(self.master, Map(4, 7, 

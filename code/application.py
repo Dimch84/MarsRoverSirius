@@ -52,7 +52,7 @@ class Application:
         self.master.mainloop()
 
     def exit(self):
-        exit()
+        self.master.quit()
 
     def make_map(self):
         print(':)')

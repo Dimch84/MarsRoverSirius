@@ -1,10 +1,11 @@
 from tkinter import BOTH, BOTTOM, Button, Frame, \
-    Label, LEFT, Misc, OptionMenu, StringVar
+    Label, LEFT, Misc, OptionMenu, StringVar, TOP
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import askyesno
 from tkinter.simpledialog import askinteger
 from enum import Enum
 
+from map_editor.square import SquareType, SquareTypeName
 from map_editor.field import Field
 
 
@@ -31,20 +32,32 @@ class UI(Frame):
     :param field: the field to which this ui should be attached.
     """
     __button_height = 5
+    __type_label = None
 
     def __init__(self, master: Misc, field: Field) -> None:
         super().__init__(master)
         self.__master = master
         self.__field = field
-        self.pack(fill=BOTH, side=BOTTOM, expand=0)
-        self.__save_button = Button(master)
-        self.__load_button = Button(master)
-        self.__random_button = Button(master)
-        self.__change_mode_button = Button(master)
-        self.__new_button = Button(master)
-        self.__exit_button = Button(master)
+        self.__buttons_frame = Frame(master)
+        self.__info_frame = Frame(master)
+        self.__save_button = Button(self.__buttons_frame)
+        self.__load_button = Button(self.__buttons_frame)
+        self.__random_button = Button(self.__buttons_frame)
+        self.__change_mode_button = Button(self.__buttons_frame)
+        self.__new_button = Button(self.__buttons_frame)
+        self.__exit_button = Button(self.__buttons_frame)
         self.__file_format = StringVar()
         self.__configure()
+
+    def change_square_type(self, new_type: int) -> None:
+        """
+        This method changes the label with the current square type.
+
+        :param new_type: id of the new square type (0 to 9).
+        :return:
+        """
+        if SquareType.has_value(new_type):
+            self.__type_label.config(text=SquareTypeName[SquareType(new_type)])
 
     def __configure(self) -> None:
         """
@@ -52,6 +65,9 @@ class UI(Frame):
 
         :return:
         """
+        self.pack(fill=BOTH, side=BOTTOM, expand=0)
+        self.__buttons_frame.pack(fill=BOTH, side=TOP, expand=0)
+        self.__info_frame.pack(fill=BOTH, side=BOTTOM, expand=0)
         self.__configure_save_button()
         self.__configure_load_button()
         self.__configure_random_button()
@@ -59,6 +75,7 @@ class UI(Frame):
         self.__configure_new_button()
         self.__configure_exit_button()
         self.__configure_file_format_menu()
+        self.__configure_current_type_label()
 
     def __configure_save_button(self) -> None:
         """
@@ -126,15 +143,25 @@ class UI(Frame):
 
         :return:
         """
-        menu_frame = Frame(self)
-        menu_frame.pack(fill=BOTH, side=BOTTOM, expand=1)
-        menu_label = Label(menu_frame, text='File format:')
+        menu_label = Label(self.__info_frame, text='File format:')
         menu_label.pack(side=LEFT)
         self.__file_format.set(FileTypes.JSON.value)
-        file_format_menu = OptionMenu(menu_frame,
+        file_format_menu = OptionMenu(self.__info_frame,
                                       self.__file_format,
                                       *FileTypes.values())
         file_format_menu.pack(side=LEFT)
+
+    def __configure_current_type_label(self) -> None:
+        """
+        This method configures the label with the current square type.
+
+        :return:
+        """
+        label = Label(self.__info_frame, text='Current square type:')
+        label.pack(side=LEFT)
+        self.__type_label = Label(self.__info_frame,
+                                  text=SquareTypeName[SquareType.FREE])
+        self.__type_label.pack(side=LEFT)
 
     def __configure_button(self, button: Button) -> None:
         """

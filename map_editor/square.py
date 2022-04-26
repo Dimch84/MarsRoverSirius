@@ -23,6 +23,19 @@ class SquareType(IntEnum):
         return value in cls._value2member_map_
 
 
+SquareTypeName = {
+    SquareType.FREE: 'Free',
+    SquareType.BLOCKED: 'Blocked',
+    SquareType.TYPE2: 'Type 2',
+    SquareType.TYPE3: 'Type 3',
+    SquareType.TYPE4: 'Type 4',
+    SquareType.TYPE5: 'Type 5',
+    SquareType.START: 'Start',
+    SquareType.FINISH: 'Finish'
+
+}
+
+
 SquareTypeColor = {
     SquareType.FREE: '#009000',
     SquareType.BLOCKED: '#900000',

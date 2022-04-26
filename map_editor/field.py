@@ -3,9 +3,9 @@ from itertools import product
 from json import dump, load
 from os.path import exists
 from random import random, randrange
-from tkinter import BOTH, Event, Frame, Misc, TOP
+from tkinter import BOTH, Canvas, Event, Frame, Misc, TOP
 
-from map_editor.square import *
+from map_editor.square import Square, SquareType
 
 
 class Field(Frame):
@@ -223,7 +223,6 @@ class Field(Frame):
             self.__start_square = None
             self.__finish_square.delete()
             self.__finish_square = None
-            self.__current_type = SquareType.FREE
 
     def zoom_in(self) -> None:
         """

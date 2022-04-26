@@ -63,6 +63,7 @@ class Editor:
             self.__field.move_up()
         elif str.isdigit(key):
             self.__field.change_square_type(int(key))
+            self.__ui.change_square_type(int(key))
 
     def __process_key_release(self, event: Event) -> None:
         """

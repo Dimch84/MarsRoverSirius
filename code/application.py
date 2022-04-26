@@ -1,9 +1,12 @@
+import os, sys
 from tkinter import *
 
 from tkinter.filedialog import askopenfilename
 
 from map import Map
 from map_drawing import draw
+
+sys.path.insert(1, os.path.join(sys.path[0], '../map_editor'))
 from editor import Editor
 
 class Application:

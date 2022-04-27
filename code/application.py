@@ -8,10 +8,11 @@ from map import Map
 from map_drawing import draw
 
 sys.path.insert(1, os.path.join(sys.path[0], '../map_editor'))
-sys.path.insert(1, os.path.join(sys.path[0], '../src'))
- 
-from a_star import A_star
 from editor import Editor
+
+sys.path.insert(1, os.path.join(sys.path[0], '../src')) 
+from a_star import A_star
+
 
 class Application:
  
@@ -82,20 +83,20 @@ class Application:
 
         self.master.withdraw()
         file_name = askopenfilename()
+
         with open(file_name, 'r') as file:
             field_data = load(file)
         start = field_data['start']
         goal = field_data['finish']
         field = field_data['field']
- 
+
+        
         path_length, path = A_star.call(start, goal, field)
         direction_path = get_direction_path(path) # путь из дельт
-        # print(path, direction_path)
         
-        # launch example
-        # draw(self.master, Map(4, 7, 
-        #     [[1,0,1,1,1,1,0], [1,0,0,0,0,0,0], [1,0,1,1,1,0,0], [0,0,1,0,0,0,0]], 
-        #     (3, 0), (3, 3), 'RUURRRRDDLL', -1))
+        
+        draw(self.master, Map(len(field), len(field[0]), 
+            field, start, goal, direction_path, -1))
 		
 
 root = Tk()

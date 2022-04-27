@@ -38,14 +38,17 @@ class draw(Frame):
             new_mars_rover_coordinate_x = mars_rover_coordinate_x
             
             # next coordinate
-            if step == 'U':
-                new_mars_rover_coordinate_y -= 1
-            if step == 'D':
-                new_mars_rover_coordinate_y += 1
-            if step == 'R':
-                new_mars_rover_coordinate_x += 1
-            if step == 'L':
-                new_mars_rover_coordinate_x -= 1
+            # if step == 'U':
+            #     new_mars_rover_coordinate_y -= 1
+            # if step == 'D':
+            #     new_mars_rover_coordinate_y += 1
+            # if step == 'R':
+            #     new_mars_rover_coordinate_x += 1
+            # if step == 'L':
+            #     new_mars_rover_coordinate_x -= 1
+
+            new_mars_rover_coordinate_x += step[1]
+            new_mars_rover_coordinate_y += step[0]
 
 
             canvas.create_line(
@@ -106,18 +109,21 @@ class draw(Frame):
 
         for step in map.mars_rover_path:
             # next coordinate
-            if step == 'U':
-                mars_rover_coordinate_y = -1
-                mars_rover_coordinate_x = 0
-            if step == 'D':
-                mars_rover_coordinate_y = 1
-                mars_rover_coordinate_x = 0
-            if step == 'R':
-                mars_rover_coordinate_y = 0
-                mars_rover_coordinate_x = 1
-            if step == 'L':
-                mars_rover_coordinate_y = 0
-                mars_rover_coordinate_x = -1
+            # if step == 'U':
+            #     mars_rover_coordinate_y = -1
+            #     mars_rover_coordinate_x = 0
+            # if step == 'D':
+            #     mars_rover_coordinate_y = 1
+            #     mars_rover_coordinate_x = 0
+            # if step == 'R':
+            #     mars_rover_coordinate_y = 0
+            #     mars_rover_coordinate_x = 1
+            # if step == 'L':
+            #     mars_rover_coordinate_y = 0
+            #     mars_rover_coordinate_x = -1
+
+            mars_rover_coordinate_x = step[1] 
+            mars_rover_coordinate_y = step[0]
 
             #animation
             for i in range (map.size_cell):
@@ -162,18 +168,20 @@ class draw(Frame):
 
         for step in map.mars_rover_path:
             # next coordinate
-            if step == 'U':
-                mars_rover_coordinate_y = -1
-                mars_rover_coordinate_x = 0
-            if step == 'D':
-                mars_rover_coordinate_y = 1
-                mars_rover_coordinate_x = 0
-            if step == 'R':
-                mars_rover_coordinate_y = 0
-                mars_rover_coordinate_x = 1
-            if step == 'L':
-                mars_rover_coordinate_y = 0
-                mars_rover_coordinate_x = -1
+            # if step == 'U':
+            #     mars_rover_coordinate_y = -1
+            #     mars_rover_coordinate_x = 0
+            # if step == 'D':
+            #     mars_rover_coordinate_y = 1
+            #     mars_rover_coordinate_x = 0
+            # if step == 'R':
+            #     mars_rover_coordinate_y = 0
+            #     mars_rover_coordinate_x = 1
+            # if step == 'L':
+            #     mars_rover_coordinate_y = 0
+            #     mars_rover_coordinate_x = -1
+            mars_rover_coordinate_x = step[1] 
+            mars_rover_coordinate_y = step[0]
 
             #animation
             for i in range (map.size_cell):

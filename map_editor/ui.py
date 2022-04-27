@@ -237,7 +237,8 @@ class UI(Frame):
             return
         size = askinteger('Map size',
                           'Enter the size of a new map',
-                          initialvalue=100)
+                          initialvalue=100,
+                          parent=self.master)
         if size is None:
             return
         self.__field.reset(size, size)

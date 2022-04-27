@@ -1,4 +1,6 @@
+import tkinter
 from tkinter import *
+from inspect import getmro
 from json import load
 
 from tkinter.filedialog import askopenfilename
@@ -59,18 +61,19 @@ class Application:
 
         self.master.mainloop()
 
-    def on_destroy(self, event):
-        self.master.deiconify()
+    def on_destroy(self, event: Event):
+        if event.widget.winfo_parent() == '.':
+            self.master.deiconify()
 
     def exit(self):
         exit()
         #self.master.quit()
 
     def make_map(self):
+        self.master.withdraw()
         Editor(self.master)
 
     def draw_map (self):
-
         def get_direction_path(path: [(int, int)]) -> [(int, int)]:
             direction_path = []
             for i in range(len(path[:-1])):
@@ -93,7 +96,7 @@ class Application:
         goal = field_data['finish']
         field = field_data['field']
 
-        
+
         path_length, path = A_star.call(start, goal, f(field))
         direction_path = get_direction_path(path) # путь из дельт
         

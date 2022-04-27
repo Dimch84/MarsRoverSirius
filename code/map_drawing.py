@@ -8,7 +8,7 @@ class draw(Frame):
         self.slave = Toplevel(master)
         self.slave.title('Map drawing')
         self.slave.geometry("{0}x{1}+0+0".format(
-                           map.width + 1, map.height + 1 + 100))
+                           map.width + 1, map.height + 1))
 
         super().__init__()
         self.initUI(map)
@@ -108,19 +108,6 @@ class draw(Frame):
         
 
         for step in map.mars_rover_path:
-            # next coordinate
-            # if step == 'U':
-            #     mars_rover_coordinate_y = -1
-            #     mars_rover_coordinate_x = 0
-            # if step == 'D':
-            #     mars_rover_coordinate_y = 1
-            #     mars_rover_coordinate_x = 0
-            # if step == 'R':
-            #     mars_rover_coordinate_y = 0
-            #     mars_rover_coordinate_x = 1
-            # if step == 'L':
-            #     mars_rover_coordinate_y = 0
-            #     mars_rover_coordinate_x = -1
 
             mars_rover_coordinate_x = step[1] 
             mars_rover_coordinate_y = step[0]
@@ -167,19 +154,7 @@ class draw(Frame):
                                 ))
 
         for step in map.mars_rover_path:
-            # next coordinate
-            # if step == 'U':
-            #     mars_rover_coordinate_y = -1
-            #     mars_rover_coordinate_x = 0
-            # if step == 'D':
-            #     mars_rover_coordinate_y = 1
-            #     mars_rover_coordinate_x = 0
-            # if step == 'R':
-            #     mars_rover_coordinate_y = 0
-            #     mars_rover_coordinate_x = 1
-            # if step == 'L':
-            #     mars_rover_coordinate_y = 0
-            #     mars_rover_coordinate_x = -1
+            
             mars_rover_coordinate_x = step[1] 
             mars_rover_coordinate_y = step[0]
 
@@ -198,14 +173,3 @@ class draw(Frame):
                 self.update()
                 canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
 
-
-#def map_drawing (map : Map) -> None:
-
-    # init screen 
-    # root = Tk()
-    # root.title("Map drawing")
-    # root.geometry("{0}x{1}+0+0".format(
-    #                 map.width + 1, map.height + 1))
-    #ex = Draw(map)
-
-    # root.mainloop()

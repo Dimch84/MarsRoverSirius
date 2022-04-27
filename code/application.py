@@ -7,11 +7,13 @@ from tkinter.filedialog import askopenfilename
 from map import Map
 from map_drawing import draw
 
+sys.path.insert(1, os.path.join(sys.path[0], '../src')) 
+from a_star import A_star
+
+
 sys.path.insert(1, os.path.join(sys.path[0], '../map_editor'))
 from editor import Editor
 
-sys.path.insert(1, os.path.join(sys.path[0], '../src')) 
-from a_star import A_star
 
 
 class Application:
@@ -81,6 +83,12 @@ class Application:
                 direction_path.append((next_cell[0] - current_cell[0], next_cell[1] - current_cell[1]))
             return direction_path
 
+        def f(array: [[int]]):
+            string_array = []
+            for subarray in array:
+                string_array.append(''.join(map(str,subarray)))
+            return string_array
+
         self.master.withdraw()
         file_name = askopenfilename()
 
@@ -91,7 +99,7 @@ class Application:
         field = field_data['field']
 
         
-        path_length, path = A_star.call(start, goal, field)
+        path_length, path = A_star.call(start, goal, f(field))
         direction_path = get_direction_path(path) # путь из дельт
         
         

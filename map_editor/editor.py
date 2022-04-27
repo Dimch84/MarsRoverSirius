@@ -1,7 +1,7 @@
 from tkinter import Misc, Toplevel
 
-from field import Field
-from ui import UI
+from map_editor.field import Field
+from map_editor.ui import UI
 
 
 class Editor:

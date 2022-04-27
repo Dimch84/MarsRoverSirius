@@ -1,5 +1,5 @@
-from cell import Cell 
-from field import Field
+from src.cell import Cell
+from src.field import Field
 
 class Edges:
 	"""

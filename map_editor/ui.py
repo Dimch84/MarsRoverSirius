@@ -5,7 +5,7 @@ from tkinter.messagebox import askyesno
 from tkinter.simpledialog import askinteger
 from enum import Enum
 
-from field import Field
+from map_editor.field import Field
 
 
 class FileTypes(Enum):

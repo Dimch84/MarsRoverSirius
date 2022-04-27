@@ -7,13 +7,8 @@ from tkinter.filedialog import askopenfilename
 from map import Map
 from map_drawing import draw
 
-sys.path.insert(1, os.path.join(sys.path[0], '../src')) 
-from a_star import A_star
-
-
-sys.path.insert(1, os.path.join(sys.path[0], '../map_editor'))
-from editor import Editor
-
+from src.a_star import A_star
+from map_editor.editor import Editor
 
 
 class Application:

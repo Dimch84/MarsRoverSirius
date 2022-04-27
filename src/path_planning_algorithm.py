@@ -1,8 +1,8 @@
 from heapdict import heapdict
 
-from cell import Cell
-from field import Field
-from edges import Edges
+from src.cell import Cell
+from src.field import Field
+from src.edges import Edges
 
 class Path_planning_algorithm:
 	"""

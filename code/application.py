@@ -1,4 +1,3 @@
-import os, sys
 from tkinter import *
 from json import load
 
@@ -64,7 +63,8 @@ class Application:
         self.master.deiconify()
 
     def exit(self):
-        self.master.quit()
+        exit()
+        #self.master.quit()
 
     def make_map(self):
         Editor(self.master)

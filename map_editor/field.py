@@ -1,134 +1,11 @@
 from csv import reader, writer
-from enum import IntEnum
 from itertools import product
 from json import dump, load
 from os.path import exists
 from random import random, randrange
 from tkinter import BOTH, Canvas, Event, Frame, Misc, TOP
 
-
-class SquareType(IntEnum):
-    FREE = 1
-    BLOCKED = 2
-    TYPE2 = 3
-    TYPE3 = 4
-    TYPE4 = 5
-    TYPE5 = 6
-    START = 10
-    FINISH = 11
-
-    @classmethod
-    def has_value(cls, value: int) -> bool:
-        """
-        This method checks if this class contains a certain value.
-
-        :param value: the value for which to check if this class contains it.
-        :return: true if this class contains the value.
-        """
-        return value in cls._value2member_map_
-
-
-SquareTypeColor = {
-    SquareType.FREE: '#009000',
-    SquareType.BLOCKED: '#900000',
-    SquareType.TYPE2: '#a06000',
-    SquareType.TYPE3: '#00b090',
-    SquareType.TYPE4: '#900090',
-    SquareType.TYPE5: '#666666',
-    SquareType.START: '#000090',
-    SquareType.FINISH: '#c0a000'
-}
-
-
-class Square:
-    """
-    This class contains information about one square on the canvas and provides
-    methods to change its parameters.
-
-    :param canvas: the canvas on which to draw the square.
-    :param square_type: the type of the square.
-    :param size: the size of the square.
-    :param position: the position of the top left corner of the square.
-    :param square_id: the id of the square on the canvas.
-    """
-
-    def __init__(self, canvas: Canvas,
-                 square_type: SquareType = SquareType.FREE,
-                 size: int = 0, position: tuple = (0, 0),
-                 square_id: int = None) -> None:
-        self.__canvas = canvas
-        self.square_type = square_type
-        self.position = position
-        self.size = size
-        self.__square_id = square_id
-
-    def draw(self, size: int = None, position: tuple = None) -> None:
-        """
-        This method changes the size and the position of this square and draws
-        it on the canvas.
-
-        :param size: new size of the square.
-        :param position: new position of the square.
-        :return:
-        """
-        if size is not None:
-            self.size = size
-        if position is not None:
-            self.position = position
-        if self.__square_id is None:
-            self.__create()
-        else:
-            x0, y0, x1, y1 = self.get_coordinates()
-            self.__canvas.coords(self.__square_id, x0, y0, x1, y1)
-
-    def change_type(self, square_type: SquareType) -> None:
-        """
-        This method changes the type of this square.
-
-        :param square_type: new type of the square.
-        :return:
-        """
-        self.square_type = square_type
-        if self.__square_id is None:
-            self.__create()
-        else:
-            color = SquareTypeColor[self.square_type]
-            self.__canvas.itemconfig(self.__square_id,
-                                     fill=color, outline=color)
-
-    def delete(self) -> None:
-        """
-        This method deletes this square.
-
-        :return:
-        """
-        if self.__square_id is not None:
-            self.__canvas.delete(self.__square_id)
-        self.square_type = SquareType.FREE
-        self.size = 0
-        self.position = (0, 0)
-        self.__square_id = None
-
-    def get_coordinates(self) -> tuple:
-        """
-        This method returns the position of the top left and bottom right
-        corners of this square.
-
-        :return: 4 coordinates.
-        """
-        return (self.position[0], self.position[1],
-                self.position[0] + self.size, self.position[1] + self.size)
-
-    def __create(self) -> None:
-        """
-        This method creates a new square on the canvas.
-
-        :return:
-        """
-        x0, y0, x1, y1 = self.get_coordinates()
-        color = SquareTypeColor[self.square_type]
-        self.__square_id = self.__canvas.create_rectangle(
-            x0, y0, x1, y1, fill=color, outline=color)
+from map_editor.square import Square, SquareType
 
 
 class Field(Frame):
@@ -346,7 +223,100 @@ class Field(Frame):
             self.__start_square = None
             self.__finish_square.delete()
             self.__finish_square = None
-            self.__current_type = SquareType.FREE
+
+    def zoom_in(self) -> None:
+        """
+        This method zooms in the field.
+
+        :return:
+        """
+        if self.__square_size >= self.__max_square_size:
+            return
+        self.__square_size *= self.__scale_coefficient
+        self.__scale_level //= self.__scale_coefficient
+        self.__canvas.scale('all', self.__padding, self.__padding,
+                            self.__scale_coefficient,
+                            self.__scale_coefficient)
+
+    def zoom_out(self) -> None:
+        """
+        This method zooms out the field.
+
+        :return:
+        """
+        if self.__square_size <= self.__min_square_size:
+            return
+        self.__square_size //= self.__scale_coefficient
+        self.__scale_level *= self.__scale_coefficient
+        self.__canvas.scale('all', self.__padding, self.__padding,
+                            1 / self.__scale_coefficient,
+                            1 / self.__scale_coefficient)
+
+    def move_right(self) -> None:
+        """
+        This method moves right the view of the field.
+
+        :return:
+        """
+        if self.__left_shift + self.__scale_level > self.__width:
+            delta = -(self.__width - self.__left_shift) * self.__square_size
+            self.__left_shift = self.__width
+        else:
+            delta = -self.__scale_level * self.__square_size
+            self.__left_shift += self.__scale_level
+        self.__canvas.move('all', delta, 0)
+
+    def move_left(self) -> None:
+        """
+        This method moves left the view of the field.
+
+        :return:
+        """
+        if self.__left_shift - self.__scale_level < 0:
+            delta = self.__left_shift * self.__square_size
+            self.__left_shift = 0
+        else:
+            delta = self.__scale_level * self.__square_size
+            self.__left_shift -= self.__scale_level
+        self.__canvas.move('all', delta, 0)
+
+    def move_down(self) -> None:
+        """
+        This method moves down the view of the field.
+
+        :return:
+        """
+        if self.__up_shift + self.__scale_level > self.__height:
+            delta = -(self.__height - self.__up_shift) * self.__square_size
+            self.__up_shift = self.__height
+        else:
+            delta = -self.__scale_level * self.__square_size
+            self.__up_shift += self.__scale_level
+        self.__canvas.move('all', 0, delta)
+
+    def move_up(self) -> None:
+        """
+        This method moves up the view of the field.
+
+        :return:
+        """
+        if self.__up_shift - self.__scale_level < 0:
+            delta = self.__up_shift * self.__square_size
+            self.__up_shift = 0
+        else:
+            delta = self.__scale_level * self.__square_size
+            self.__up_shift -= self.__scale_level
+        self.__canvas.move('all', 0, delta)
+
+    def change_square_type(self, new_type: int) -> None:
+        """
+        This method changes the current square type.
+
+        :param new_type: id of the new square type (0 to 9).
+        :return:
+        """
+        if SquareType.has_value(new_type):
+            self.__current_type = SquareType(new_type)
 
     def __configure(self) -> None:
         """
@@ -356,7 +326,6 @@ class Field(Frame):
         """
         self.pack(fill=BOTH, side=TOP, expand=1)
         self.__canvas.pack(fill=BOTH, expand=1)
-        self.__add_common_binds()
         self.__add_editor_binds()
         self.reset()
 
@@ -368,17 +337,6 @@ class Field(Frame):
         """
         for row, col in product(range(self.__height), range(self.__width)):
             self.__draw_square(row, col)
-
-    def __add_common_binds(self) -> None:
-        """
-        This method adds binds to this class to process user input, not
-        depending on the current mode.
-
-        :return:
-        """
-        self.focus_set()
-        self.bind('<KeyPress>', self.__process_key_press)
-        self.bind('<KeyRelease>', self.__process_key_release)
 
     def __add_editor_binds(self) -> None:
         """
@@ -430,128 +388,6 @@ class Field(Frame):
             print(f'Could not load "{file_name}", file does not exist.')
             return False
         return True
-
-    def __process_key_press(self, event: Event) -> None:
-        """
-        This method processes a key press event, it should be used in
-        widget.bind.
-
-        :param event: tkinter event.
-        :return:
-        """
-        key = event.keysym
-        if key == 'plus':
-            self.__zoom_in()
-        elif key == 'minus':
-            self.__zoom_out()
-        elif key == 'Right':
-            self.__move_right()
-        elif key == 'Left':
-            self.__move_left()
-        elif key == 'Down':
-            self.__move_down()
-        elif key == 'Up':
-            self.__move_up()
-        elif str.isdigit(key) and SquareType.has_value(int(key)):
-            self.__current_type = SquareType(int(key))
-
-    def __process_key_release(self, event: Event) -> None:
-        """
-        This method processes a key release event, it should be used in
-        widget.bind.
-
-        :param event: tkinter event.
-        :return:
-        """
-        key = event.keysym
-        if key == 'Alt_L' or key == 'Alt_R':
-            self.__alt_pressed = False
-        elif key == 'Shift_L' or key == 'Shift_R':
-            self.__shift_pressed = False
-
-    def __zoom_in(self) -> None:
-        """
-        This method zooms in the field.
-
-        :return:
-        """
-        if self.__square_size >= self.__max_square_size:
-            return
-        self.__square_size *= self.__scale_coefficient
-        self.__scale_level //= self.__scale_coefficient
-        self.__canvas.scale('all', self.__padding, self.__padding,
-                            self.__scale_coefficient,
-                            self.__scale_coefficient)
-
-    def __zoom_out(self) -> None:
-        """
-        This method zooms out the field.
-
-        :return:
-        """
-        if self.__square_size <= self.__min_square_size:
-            return
-        self.__square_size //= self.__scale_coefficient
-        self.__scale_level *= self.__scale_coefficient
-        self.__canvas.scale('all', self.__padding, self.__padding,
-                            1 / self.__scale_coefficient,
-                            1 / self.__scale_coefficient)
-
-    def __move_right(self) -> None:
-        """
-        This method moves right the view of the field.
-
-        :return:
-        """
-        if self.__left_shift + self.__scale_level > self.__width:
-            delta = -(self.__width - self.__left_shift) * self.__square_size
-            self.__left_shift = self.__width
-        else:
-            delta = -self.__scale_level * self.__square_size
-            self.__left_shift += self.__scale_level
-        self.__canvas.move('all', delta, 0)
-
-    def __move_left(self) -> None:
-        """
-        This method moves left the view of the field.
-
-        :return:
-        """
-        if self.__left_shift - self.__scale_level < 0:
-            delta = self.__left_shift * self.__square_size
-            self.__left_shift = 0
-        else:
-            delta = self.__scale_level * self.__square_size
-            self.__left_shift -= self.__scale_level
-        self.__canvas.move('all', delta, 0)
-
-    def __move_down(self) -> None:
-        """
-        This method moves down the view of the field.
-
-        :return:
-        """
-        if self.__up_shift + self.__scale_level > self.__height:
-            delta = -(self.__height - self.__up_shift) * self.__square_size
-            self.__up_shift = self.__height
-        else:
-            delta = -self.__scale_level * self.__square_size
-            self.__up_shift += self.__scale_level
-        self.__canvas.move('all', 0, delta)
-
-    def __move_up(self) -> None:
-        """
-        This method moves up the view of the field.
-
-        :return:
-        """
-        if self.__up_shift - self.__scale_level < 0:
-            delta = self.__up_shift * self.__square_size
-            self.__up_shift = 0
-        else:
-            delta = self.__scale_level * self.__square_size
-            self.__up_shift -= self.__scale_level
-        self.__canvas.move('all', 0, delta)
 
     def __change_square(self, event: Event) -> None:
         """

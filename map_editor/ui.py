@@ -160,7 +160,7 @@ class UI(Frame):
         label = Label(self.__info_frame, text='Current square type:')
         label.pack(side=LEFT)
         self.__type_label = Label(self.__info_frame,
-                                  text=SquareTypeName[SquareType.FREE])
+                                  text=SquareTypeName[SquareType.PLAIN])
         self.__type_label.pack(side=LEFT)
 
     def __configure_button(self, button: Button) -> None:

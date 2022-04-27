@@ -34,7 +34,7 @@ class Field(Frame):
     __area = None
     __alt_pressed = False
     __shift_pressed = False
-    __current_type = SquareType.FREE
+    __current_type = SquareType.PLAIN
     __editor_mode = True
 
     def __init__(self, master: Misc, width: int = 10, height: int = 10,
@@ -63,7 +63,7 @@ class Field(Frame):
                     row == finish_row and col == finish_col:
                 continue
             if random() < self.__density:
-                self.__field_data[row][col].change_type(SquareType.BLOCKED)
+                self.__field_data[row][col].change_type(SquareType.MOUNTAIN)
 
     def save_json(self, file_name: str) -> None:
         """

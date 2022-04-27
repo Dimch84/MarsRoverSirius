@@ -3,12 +3,10 @@ from tkinter import Canvas
 
 
 class SquareType(IntEnum):
-    FREE = 1
-    BLOCKED = 2
-    TYPE2 = 3
-    TYPE3 = 4
-    TYPE4 = 5
-    TYPE5 = 6
+    PLAIN = 1
+    MOUNTAIN = 2
+    SAND = 3
+    CRATER = 4
     START = 10
     FINISH = 11
 
@@ -24,12 +22,10 @@ class SquareType(IntEnum):
 
 
 SquareTypeName = {
-    SquareType.FREE: 'Free',
-    SquareType.BLOCKED: 'Blocked',
-    SquareType.TYPE2: 'Type 2',
-    SquareType.TYPE3: 'Type 3',
-    SquareType.TYPE4: 'Type 4',
-    SquareType.TYPE5: 'Type 5',
+    SquareType.PLAIN: 'Plain',
+    SquareType.MOUNTAIN: 'Mountain',
+    SquareType.SAND: 'Sand',
+    SquareType.CRATER: 'Crater',
     SquareType.START: 'Start',
     SquareType.FINISH: 'Finish'
 
@@ -37,12 +33,10 @@ SquareTypeName = {
 
 
 SquareTypeColor = {
-    SquareType.FREE: '#009000',
-    SquareType.BLOCKED: '#900000',
-    SquareType.TYPE2: '#a06000',
-    SquareType.TYPE3: '#00b090',
-    SquareType.TYPE4: '#900090',
-    SquareType.TYPE5: '#666666',
+    SquareType.PLAIN: '#009000',
+    SquareType.MOUNTAIN: '#900000',
+    SquareType.SAND: '#a06000',
+    SquareType.CRATER: '#00b090',
     SquareType.START: '#000090',
     SquareType.FINISH: '#c0a000'
 }
@@ -61,7 +55,7 @@ class Square:
     """
 
     def __init__(self, canvas: Canvas,
-                 square_type: SquareType = SquareType.FREE,
+                 square_type: SquareType = SquareType.PLAIN,
                  size: int = 0, position: tuple = (0, 0),
                  square_id: int = None) -> None:
         self.__canvas = canvas
@@ -112,7 +106,7 @@ class Square:
         """
         if self.__square_id is not None:
             self.__canvas.delete(self.__square_id)
-        self.square_type = SquareType.FREE
+        self.square_type = SquareType.PLAIN
         self.size = 0
         self.position = (0, 0)
         self.__square_id = None

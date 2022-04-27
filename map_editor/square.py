@@ -3,10 +3,10 @@ from tkinter import Canvas
 
 
 class SquareType(IntEnum):
-    PLAIN = 1
-    MOUNTAIN = 2
-    SAND = 3
-    CRATER = 4
+    PLAIN = 0
+    MOUNTAIN = 1
+    SAND = 2
+    CRATER = 3
     START = 10
     FINISH = 11
 

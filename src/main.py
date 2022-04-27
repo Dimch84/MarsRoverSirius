@@ -1,7 +1,7 @@
-from a_star import A_star 
-from a_star import Path_planning_algorithm
-from lifelong_a_star import Lifelong_a_star
-from field import Field
+from src.a_star import A_star
+from src.a_star import Path_planning_algorithm
+from src.lifelong_a_star import Lifelong_a_star
+from src.field import Field
 
 def main():
 	height, width = list(map(int, input().split()))

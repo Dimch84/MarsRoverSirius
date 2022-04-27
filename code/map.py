@@ -16,7 +16,7 @@ class Map:
     def __init__(self, 
                  n: int, m: int, map: list,
                  start_point: list, finish_point: list, 
-                 mars_rover_path: str,
+                 mars_rover_path: list,
                  radius_black_zone: int):
         
         self.n = n

@@ -1,7 +1,7 @@
 from heapdict import heapdict
 
-from cell import Cell
-from path_planning_algorithm import Path_planning_algorithm
+from src.cell import Cell
+from src.path_planning_algorithm import Path_planning_algorithm
 
 class A_star(Path_planning_algorithm):
 	"""

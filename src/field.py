@@ -1,4 +1,4 @@
-from cell import Cell
+from src.cell import Cell
 
 STEPS = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
 

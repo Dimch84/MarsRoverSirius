@@ -1,6 +1,8 @@
 from enum import IntEnum
+from pydoc import plain
 from tkinter import Canvas
 
+from code.color_application import color
 
 class SquareType(IntEnum):
     PLAIN = 0
@@ -33,12 +35,12 @@ SquareTypeName = {
 
 
 SquareTypeColor = {
-    SquareType.PLAIN: '#D6FA3F',
-    SquareType.MOUNTAIN: '#BFB430',
-    SquareType.SAND: '#FFF040',
-    SquareType.CRATER: '#FFD140',
-    SquareType.START: '#9DB82E',
-    SquareType.FINISH: '#819F00'
+    SquareType.PLAIN: color.plain,
+    SquareType.MOUNTAIN: color.mountain,
+    SquareType.SAND: color.sand,
+    SquareType.CRATER: color.crater,
+    SquareType.START: color.start,
+    SquareType.FINISH: color.finish
 }
 
 

@@ -8,6 +8,8 @@ from enum import Enum
 from map_editor.square import SquareType, SquareTypeName
 from map_editor.field import Field
 
+from code.color_application import color
+
 
 class FileTypes(Enum):
     JSON = 'JSON'
@@ -85,7 +87,9 @@ class UI(Frame):
         """
         self.__configure_button(self.__save_button)
         self.__save_button.config(text='Save',
-                                  command=self.__save)
+                                  command=self.__save,
+                                  bg = color.button_background,
+                                  activebackground = color.button_a_background)
 
     def __configure_load_button(self) -> None:
         """
@@ -95,7 +99,9 @@ class UI(Frame):
         """
         self.__configure_button(self.__load_button)
         self.__load_button.config(text='Load',
-                                  command=self.__load)
+                                  command=self.__load,
+                                  bg = color.button_background,
+                                  activebackground = color.button_a_background)
 
     def __configure_random_button(self) -> None:
         """
@@ -105,7 +111,9 @@ class UI(Frame):
         """
         self.__configure_button(self.__random_button)
         self.__random_button.config(text='Randomise',
-                                    command=self.__generate_random)
+                                    command=self.__generate_random,
+                                    bg = color.button_background,
+                                    activebackground = color.button_a_background)
 
     def __configure_change_mode_button(self) -> None:
         """
@@ -115,7 +123,9 @@ class UI(Frame):
         """
         self.__configure_button(self.__random_button)
         self.__random_button.config(text='Change mode',
-                                    command=self.__field.change_mode)
+                                    command=self.__field.change_mode,
+                                    bg = color.button_background,
+                                    activebackground = color.button_a_background)
 
     def __configure_new_button(self) -> None:
         """
@@ -125,7 +135,9 @@ class UI(Frame):
         """
         self.__configure_button(self.__new_button)
         self.__new_button.config(text='New',
-                                 command=self.__create_new)
+                                 command=self.__create_new,
+                                 bg = color.button_background,
+                                 activebackground = color.button_a_background)
 
     def __configure_exit_button(self) -> None:
         """
@@ -135,7 +147,9 @@ class UI(Frame):
         """
         self.__configure_button(self.__exit_button)
         self.__exit_button.config(text='Exit',
-                                  command=self.__exit)
+                                  command=self.__exit,
+                                  bg = color.button_background,
+                                  activebackground = color.button_a_background)
 
     def __configure_file_format_menu(self) -> None:
         """

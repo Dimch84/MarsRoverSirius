@@ -12,6 +12,7 @@ from code.map_drawing import draw
 from src.a_star import A_star
 from map_editor.editor import Editor
 
+from code.color_application import color
 
 class Application:
  
@@ -24,8 +25,8 @@ class Application:
         self.button_exit = Button(self.master, 
                    text ="EXIT", 
                    command = self.exit,
-                   bg = 'thistle2',
-                   activebackground = 'thistle1')
+                   bg = color.button_background,
+                   activebackground = color.button_a_background)
 
         self.button_exit.place(x = 350,
                 y = 550, 
@@ -37,8 +38,8 @@ class Application:
         self.button = Button(self.master, 
                    text ="MAP", 
                    command = self.draw_map,
-                   bg = 'thistle2',
-                   activebackground = 'thistle1')
+                   bg = color.button_background,
+                   activebackground = color.button_a_background)
 
         self.button.place(x = 350,
                 y = 450, 
@@ -50,8 +51,8 @@ class Application:
         self.button_make_map = Button(self.master, 
                    text ="MAKE MAP", 
                    command = self.make_map,
-                   bg = 'thistle2',
-                   activebackground = 'thistle1')
+                   bg = color.button_background,
+                   activebackground = color.button_a_background)
 
         self.button_make_map.place(x = 350,
                 y = 350, 
@@ -80,6 +81,7 @@ class Application:
         Editor(self.master)
 
     def draw_map (self):
+        
         def get_direction_path(path: [(int, int)]) -> [(int, int)]:
             direction_path = []
             for i in range(len(path[:-1])):

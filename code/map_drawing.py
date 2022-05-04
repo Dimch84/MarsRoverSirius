@@ -1,6 +1,7 @@
 from tkinter import *
 
 from code.map import Map
+from map_editor.square import SquareType, SquareTypeName, SquareTypeColor
 
 class draw(Frame):
  
@@ -76,13 +77,11 @@ class draw(Frame):
                             justify = 'center')
 
     def draw_map (self, map : Map, canvas : Canvas) -> None:
-        # draw cell
+
         for i in range (map.m):
             for j in range (map.n):
 
-                color_cell = 'lavender'
-                if map.map[j][i] == 1:
-                    color_cell = 'gray'
+                color_cell = SquareTypeColor[SquareType(int(map.map[j][i]))]
 
                 canvas.create_rectangle(
                         map.size_cell * i, map.size_cell * j,

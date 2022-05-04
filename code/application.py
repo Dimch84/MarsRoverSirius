@@ -4,6 +4,7 @@ from inspect import getmro
 from json import load
 
 from tkinter.filedialog import askopenfilename
+from tkinter.messagebox import askyesno
 
 from code.map import Map
 from code.map_drawing import draw
@@ -66,6 +67,11 @@ class Application:
             self.master.deiconify()
 
     def exit(self):
+        confirmed = askyesno('Exit',
+                             'Are you sure you want to exit?')
+        if not confirmed:
+            return
+
         exit()
         #self.master.quit()
 

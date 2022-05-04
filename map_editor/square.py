@@ -33,12 +33,12 @@ SquareTypeName = {
 
 
 SquareTypeColor = {
-    SquareType.PLAIN: '#009000',
-    SquareType.MOUNTAIN: '#900000',
-    SquareType.SAND: '#a06000',
-    SquareType.CRATER: '#00b090',
-    SquareType.START: '#000090',
-    SquareType.FINISH: '#c0a000'
+    SquareType.PLAIN: '#D6FA3F',
+    SquareType.MOUNTAIN: '#BFB430',
+    SquareType.SAND: '#FFF040',
+    SquareType.CRATER: '#FFD140',
+    SquareType.START: '#9DB82E',
+    SquareType.FINISH: '#819F00'
 }
 
 

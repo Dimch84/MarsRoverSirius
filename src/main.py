@@ -26,7 +26,7 @@ def main():
 	points = [(0, 4), (4, 0), (4, 4)]
 
 	path_length, path = Intermediate_points_algorithm.call(start, goal, points, field_input)
-	print(path_length)
+	print(path_length, path)
 
 	# height, width = list(map(int, input().split()))
 	# field_input = [input() for i in range(height)]

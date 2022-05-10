@@ -1,4 +1,4 @@
-from code.map import Map
+from application.map import Map
 
 def checking_the_answer_simple_map(map : Map) -> list:
     

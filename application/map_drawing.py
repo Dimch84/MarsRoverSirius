@@ -1,6 +1,6 @@
 from tkinter import *
 
-from code.map import Map
+from application.map import Map
 
 class draw(Frame):
  

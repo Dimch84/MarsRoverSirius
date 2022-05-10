@@ -1,14 +1,15 @@
+import json
 import tkinter
 from tkinter import *
 from inspect import getmro
-from json import load
+from json import load, loads
+from requests import get, post
 
 from tkinter.filedialog import askopenfilename
 
-from code.map import Map
-from code.map_drawing import draw
+from application.map import Map
+from application.map_drawing import draw
 
-from src.a_star import A_star
 from map_editor.editor import Editor
 
 
@@ -58,7 +59,6 @@ class Application:
                 width = 300, 
                 bordermode='outside')
 
-
         self.master.mainloop()
 
     def on_destroy(self, event: Event):
@@ -67,7 +67,7 @@ class Application:
 
     def exit(self):
         exit()
-        #self.master.quit()
+        self.master.quit()
 
     def make_map(self):
         self.master.withdraw()
@@ -96,16 +96,13 @@ class Application:
         goal = field_data['finish']
         field = field_data['field']
 
+        url = 'http://127.0.0.1:5000'  # TODO: better organize urls
+        form = json.dumps({'start': start, 'goal': goal, 'field': f(field)})
+        path_length, path = loads(post(url, json=form).content)
 
-        path_length, path = A_star.call(start, goal, f(field))
+        # path_length, path = A_star.call(start, goal, f(field))
         direction_path = get_direction_path(path) # путь из дельт
         
         
         draw(self.master, Map(len(field), len(field[0]), 
             field, start, goal, direction_path, -1))
-		
-
-root = Tk()
-Application (root)
-
-

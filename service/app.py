@@ -20,14 +20,18 @@ def process_maps():
         field = loads(request.json)
         field_name = field['name']
         fields[field_name] = field
-        return str(len(fields) - 1)
+        return 'OK'
     if request.method == 'GET':
         return dumps(fields)
 
 
-@app.route('/maps/<field_name>', methods=['GET'])
+@app.route('/maps/<field_name>', methods=['GET', 'DELETE'])
 def get_solution(field_name):
     if field_name not in fields:
         return 'Unknown map name'
-    field = fields[field_name]
-    return dumps(A_star.call(field['start'], field['finish'], f(field['field'])))
+    if request.method == 'DELETE':
+        fields.pop(field_name)
+        return 'OK'
+    if request.method == 'GET':
+        field = fields[field_name]
+        return dumps(A_star.call(field['start'], field['finish'], f(field['field'])))

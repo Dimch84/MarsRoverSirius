@@ -1,27 +1,14 @@
+from json import dumps, loads
+from requests import get, post
 from tkinter import BOTH, BOTTOM, Button, Frame, \
-    Label, LEFT, Misc, OptionMenu, StringVar, TOP
-from tkinter.filedialog import askopenfilename, asksaveasfilename
-from tkinter.messagebox import askyesno
-from tkinter.simpledialog import askinteger
-from enum import Enum
+    Label, LEFT, Misc, TOP
+from tkinter.messagebox import askokcancel, askyesno, showinfo
+from tkinter.simpledialog import askinteger, askstring
 
+from constants import url
 from map_editor.square import SquareType, SquareTypeName
 from map_editor.field import Field
-
-
-class FileTypes(Enum):
-    JSON = 'JSON'
-    CSV = 'CSV'
-    TXT = 'TXT'
-
-    @classmethod
-    def values(cls) -> list:
-        """
-        This method returns all the values of this Enum.
-
-        :return: list of the values.
-        """
-        return list(map(lambda option: option.value, cls))
+from utils import load_fields, choose_field
 
 
 class UI(Frame):
@@ -46,7 +33,6 @@ class UI(Frame):
         self.__change_mode_button = Button(self.__buttons_frame)
         self.__new_button = Button(self.__buttons_frame)
         self.__exit_button = Button(self.__buttons_frame)
-        self.__file_format = StringVar()
         self.__configure()
 
     def change_square_type(self, new_type: int) -> None:
@@ -74,7 +60,6 @@ class UI(Frame):
         self.__configure_change_mode_button()
         self.__configure_new_button()
         self.__configure_exit_button()
-        self.__configure_file_format_menu()
         self.__configure_current_type_label()
 
     def __configure_save_button(self) -> None:
@@ -137,20 +122,6 @@ class UI(Frame):
         self.__exit_button.config(text='Exit',
                                   command=self.__exit)
 
-    def __configure_file_format_menu(self) -> None:
-        """
-        This method configures file format option menu.
-
-        :return:
-        """
-        menu_label = Label(self.__info_frame, text='File format:')
-        menu_label.pack(side=LEFT)
-        self.__file_format.set(FileTypes.JSON.value)
-        file_format_menu = OptionMenu(self.__info_frame,
-                                      self.__file_format,
-                                      *FileTypes.values())
-        file_format_menu.pack(side=LEFT)
-
     def __configure_current_type_label(self) -> None:
         """
         This method configures the label with the current square type.
@@ -174,42 +145,45 @@ class UI(Frame):
 
     def __save(self) -> None:
         """
-        This method saves the field to a file.
+        This method uploads the field to service.
 
         :return:
         """
-        file_name = asksaveasfilename()
-        if file_name == '':
+        all_names = list(loads(get(url).content))
+        field_description = askstring('Map description',
+                                      'Enter short description:',
+                                      parent=self.master)
+        field_name = askstring('Map name', 'Choose map name:',
+                               parent=self.master)
+        while field_name and field_name in all_names:
+            field_name = askstring('Map name',
+                                   'A map with the same name already exists, '
+                                   'please choose another name:',
+                                   parent=self.master)
+        if not field_name:
             return
-        file_type = self.__file_format.get()
-        if file_type == FileTypes.JSON.value:
-            self.__field.save_json(file_name)
-        elif file_type == FileTypes.CSV.value:
-            self.__field.save_csv(file_name)
-        elif file_type == FileTypes.TXT.value:
-            self.__field.save_txt(file_name)
+        field_json = self.__field.save_json(field_name, field_description)
+        post(url, json=field_json)
+        showinfo('Map saved', 'The map was successfully saved.')
 
     def __load(self) -> None:
         """
-        This method loads the field from a file.
+        This method loads the field from service.
 
         :return:
         """
         confirmed = askyesno('Load',
                              'Are you sure you want to load a new map '
-                             '(current map will not be saved)?')
+                             '(current map will not be saved)?',
+                             parent=self.master)
         if not confirmed:
             return
-        file_name = askopenfilename()
-        if file_name == '':
-            return
-        file_type = self.__file_format.get()
-        if file_type == FileTypes.JSON.value:
-            self.__field.load_json(file_name)
-        elif file_type == FileTypes.CSV.value:
-            self.__field.load_csv(file_name)
-        elif file_type == FileTypes.TXT.value:
-            self.__field.load_txt(file_name)
+        slave, fields_list, all_fields = load_fields(self.master)
+        btn = Button(slave, text="Load",
+                     command=lambda:
+                     choose_field(fields_list, all_fields,
+                                  self.__load_chosen, slave))
+        btn.pack()
 
     def __generate_random(self) -> None:
         """
@@ -219,7 +193,8 @@ class UI(Frame):
         """
         confirmed = askyesno('Randomise',
                              'Are you sure you want to randomise this map '
-                             '(current state of the map will not be saved)?')
+                             '(current state of the map will not be saved)?',
+                             parent=self.master)
         if not confirmed:
             return
         self.__field.generate_random()
@@ -255,3 +230,7 @@ class UI(Frame):
         if not confirmed:
             return
         self.__master.destroy()
+
+    def __load_chosen(self, field, slave):
+        self.__field.load_json(dumps(field))
+        slave.destroy()

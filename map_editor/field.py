@@ -1,6 +1,5 @@
-from csv import reader, writer
 from itertools import product
-from json import dump, load
+from json import dumps, loads
 from os.path import exists
 from random import random, randrange
 from tkinter import BOTH, Canvas, Event, Frame, Misc, TOP
@@ -65,12 +64,13 @@ class Field(Frame):
             if random() < self.__density:
                 self.__field_data[row][col].change_type(SquareType.MOUNTAIN)
 
-    def save_json(self, file_name: str) -> None:
+    def save_json(self, field_name: str, description: str) -> str:
         """
-        This method saves the field to a json file.
+        This method saves the field to a json string.
 
-        :param file_name: output file name.
-        :return:
+        :param field_name: name of the field.
+        :param description: description of the field.
+        :return: a string containing the field data in json format.
         """
         field_data = {
             'width': self.__width,
@@ -80,103 +80,25 @@ class Field(Frame):
                       for row in range(self.__height)],
             'start': self.__start_position,
             'finish': self.__finish_position,
+            'name': field_name,
+            'description': description
         }
-        with open(file_name, 'w') as file:
-            dump(field_data, file, indent=2)
+        return dumps(field_data)
 
-    def load_json(self, file_name: str) -> None:
+    def load_json(self, field_json: str) -> None:
         """
-        This method loads the field from a json file.
+        This method loads the field from a json string.
 
-        :param file_name: input file name.
+        :param field_json: a string containing the field data in json format.
         :return:
         """
-        if not self.__check_file(file_name):
-            return
-        with open(file_name, 'r') as file:
-            field_data = load(file)
+        field_data = loads(field_json)
         self.reset(field_data['width'], field_data['height'])
         for row, col in product(range(self.__height), range(self.__width)):
             self.__field_data[row][col].change_type(
                 field_data['field'][row][col])
         self.__start_position = field_data['start']
         self.__finish_position = field_data['finish']
-
-    def save_csv(self, file_name: str) -> None:
-        """
-        This method saves the field to a csv file.
-
-        :param file_name: output file name.
-        :return:
-        """
-        field_data = [(self.__width, self.__height)]
-        field_data += [[int(self.__field_data[row][col].square_type)
-                        for col in range(self.__width)]
-                       for row in range(self.__height)]
-        field_data.append(self.__start_position)
-        field_data.append(self.__finish_position)
-        with open(file_name, 'w') as file:
-            file_writer = writer(file)
-            file_writer.writerows(field_data)
-
-    def load_csv(self, file_name: str) -> None:
-        """
-        This method loads the field from a csv file.
-
-        :param file_name: input file name.
-        :return:
-        """
-        if not self.__check_file(file_name):
-            return
-        with open(file_name, 'r') as file:
-            file_reader = reader(file)
-            field_data = []
-            for line in file_reader:
-                field_data.append(list(map(int, line)))
-        self.reset(*field_data[0])
-        for row, col in product(range(self.__height), range(self.__width)):
-            self.__field_data[row][col].change_type(field_data[row + 1][col])
-        self.__start_position = field_data[-2]
-        self.__finish_position = field_data[-1]
-
-    def save_txt(self, file_name: str) -> None:
-        """
-        This method saves the field to a text file.
-
-        :param file_name: output file name.
-        :return:
-        """
-        with open(file_name, 'w') as file:
-            file.write(f'{self.__width} {self.__height}\n')
-            for row in range(self.__height):
-                for col in range(self.__width):
-                    square_type = self.__field_data[row][col].square_type
-                    file.write(f'{int(square_type)} ')
-                file.write('\n')
-            file.write(f'{self.__start_position[0]} '
-                       f'{self.__start_position[1]}\n')
-            file.write(f'{self.__finish_position[0]} '
-                       f'{self.__finish_position[1]}\n')
-
-    def load_txt(self, file_name: str) -> None:
-        """
-        This method loads the field from a text file.
-
-        :param file_name: input file name.
-        :return:
-        """
-        if not self.__check_file(file_name):
-            return
-        with open(file_name, 'r') as file:
-            new_width, new_height = map(int, file.readline().split())
-            self.reset(new_width, new_height)
-            for row in range(self.__height):
-                square_types = list(map(lambda x: SquareType(int(x)),
-                                        file.readline().split()))
-                for col in range(self.__width):
-                    self.__field_data[row][col].change_type(square_types[col])
-            self.__start_position = tuple(map(int, file.readline().split()))
-            self.__finish_position = tuple(map(int, file.readline().split()))
 
     def reset(self, new_width: int = None, new_height: int = None) -> None:
         """

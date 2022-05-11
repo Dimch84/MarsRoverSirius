@@ -11,7 +11,6 @@ from turtle import width
 from code.map import Map
 from code.map_drawing import draw
 
-# from src.a_star import A_star
 from map_editor.editor import Editor
 
 from code.color_application import color
@@ -133,7 +132,7 @@ class Application:
             os.system('rm ' + FILE_OUT)
 
         draw(self.master, Map(len(field), len(field[0]), 
-             field, start, goal, direction_paths, radius))
+             field, start, goal, direction_paths, radius), files_name)
 		
 
 root = Tk()

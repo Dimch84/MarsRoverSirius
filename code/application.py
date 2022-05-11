@@ -104,10 +104,12 @@ class Application:
         start = field_data['start']
         goal = field_data['finish']
         field = field_data['field']
+        radius = -1
 
         argv =  str(height) + ' ' + str(width) + ' '
         argv += str(start[0]) + ' ' + str(start[1]) + ' '
         argv += str(goal[0]) + ' ' + str(goal[1]) + ' '
+        argv += str(radius) + ' '
 
 
         for i in range(height):
@@ -131,7 +133,7 @@ class Application:
             os.system('rm ' + FILE_OUT)
 
         draw(self.master, Map(len(field), len(field[0]), 
-             field, start, goal, direction_paths, -1))
+             field, start, goal, direction_paths, radius))
 		
 
 root = Tk()

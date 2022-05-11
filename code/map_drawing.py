@@ -38,7 +38,7 @@ class draw(Frame):
         # drawing movement Mars rover
         mars_rover_coordinate_y = map.start_point[0]
         mars_rover_coordinate_x = map.start_point[1]
-        for step in map.mars_rover_paths[i]:
+        for step in map.mars_rover_paths[index]:
 
             new_mars_rover_coordinate_y = mars_rover_coordinate_y
             new_mars_rover_coordinate_x = mars_rover_coordinate_x
@@ -104,7 +104,7 @@ class draw(Frame):
 
         
 
-        for step in map.mars_rover_path:
+        for step in map.mars_rover_paths[0]:
 
             mars_rover_coordinate_x = step[1] 
             mars_rover_coordinate_y = step[0]
@@ -116,7 +116,7 @@ class draw(Frame):
                             mars_rover_coordinate_x, 
                             mars_rover_coordinate_y)
                 self.update()
-                canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
+                canvas.after(3000 // (map.size_cell * len(map.mars_rover_paths[0])))
 
     def animation_with_dawn (self, map : Map, canvas : Canvas) -> None:
         
@@ -150,7 +150,7 @@ class draw(Frame):
                                 fill = 'black',
                                 ))
 
-        for step in map.mars_rover_path:
+        for step in map.mars_rover_paths[0]:
             
             mars_rover_coordinate_x = step[1] 
             mars_rover_coordinate_y = step[0]
@@ -168,5 +168,5 @@ class draw(Frame):
                                 mars_rover_coordinate_y)
 
                 self.update()
-                canvas.after(3000 // (map.size_cell * len(map.mars_rover_path)))
+                canvas.after(3000 // (map.size_cell * len(map.mars_rover_paths[0])))
 

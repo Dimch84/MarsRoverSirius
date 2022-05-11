@@ -4,17 +4,20 @@ from inspect import getmro
 from json import load
 import os
 
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, askopenfilenames
 from tkinter.messagebox import askyesno
 from turtle import width
 
 from code.map import Map
 from code.map_drawing import draw
 
-from src.a_star import A_star
+# from src.a_star import A_star
 from map_editor.editor import Editor
 
 from code.color_application import color
+
+
+FILE_OUT = 'output.json'
 
 class Application:
  
@@ -91,8 +94,8 @@ class Application:
             return string_array
 
 
-        self.master.withdraw()
-        file_name = askopenfilename()
+        # self.master.withdraw()
+        file_name = askopenfilename(title = 'Choose a file map')
 
         with open(file_name, 'r') as file:
             field_data = load(file)
@@ -102,29 +105,33 @@ class Application:
         goal = field_data['finish']
         field = field_data['field']
 
-        file_name = askopenfilename()
-
         argv =  str(height) + ' ' + str(width) + ' '
         argv += str(start[0]) + ' ' + str(start[1]) + ' '
         argv += str(goal[0]) + ' ' + str(goal[1]) + ' '
+
 
         for i in range(height):
             for j in range(width):
                 argv += str(field[i][j]) + ' ' 
 
-        file_out = 'output.json'
 
-        os.system('touch ' + file_out)
-        os.system('python3 ' + file_name + ' ' + file_out + ' ' + argv)
+        files_name = askopenfilenames(title = 'Choose a file(s)')
 
-        with open(file_out, 'r') as file:
-            field_data = load(file)
-        direction_path = field_data['path']
+        direction_paths = []
 
-        os.system('rm ' + file_out)
+        for file_name in files_name:
+
+            os.system('touch ' + FILE_OUT)
+            os.system('python3 ' + file_name + ' ' + FILE_OUT + ' ' + argv)
+
+            with open(FILE_OUT, 'r') as file:
+                field_data = load(file)
+            direction_paths.append(field_data['path'])
+
+            os.system('rm ' + FILE_OUT)
 
         draw(self.master, Map(len(field), len(field[0]), 
-             field, start, goal, direction_path, -1))
+             field, start, goal, direction_paths, -1))
 		
 
 root = Tk()

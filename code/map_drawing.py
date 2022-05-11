@@ -2,6 +2,7 @@ from tkinter import *
 
 from code.map import Map
 from map_editor.square import SquareType, SquareTypeName, SquareTypeColor
+from code.color_application import color
 
 class draw(Frame):
  
@@ -20,7 +21,11 @@ class draw(Frame):
         canvas.pack(fill = 'both', expand = 1)
 
         self.draw_map (map, canvas)
-        self.draw_path (map, canvas)
+
+        for i in range(len(map.mars_rover_paths)):
+            self.draw_path (map, canvas, i)
+        
+        self.draw_start_and_finish (map, canvas)
 
         if map.radius == -1:
             self.animation (map, canvas)
@@ -28,26 +33,16 @@ class draw(Frame):
             self.animation_with_dawn (map, canvas)
 
     
-    def draw_path (self, map : Map, canvas : Canvas) -> None:
+    def draw_path (self, map : Map, canvas : Canvas, index : int) -> None:
         
         # drawing movement Mars rover
         mars_rover_coordinate_y = map.start_point[0]
         mars_rover_coordinate_x = map.start_point[1]
-        for step in map.mars_rover_path:
+        for step in map.mars_rover_paths[i]:
 
             new_mars_rover_coordinate_y = mars_rover_coordinate_y
             new_mars_rover_coordinate_x = mars_rover_coordinate_x
             
-            # next coordinate
-            # if step == 'U':
-            #     new_mars_rover_coordinate_y -= 1
-            # if step == 'D':
-            #     new_mars_rover_coordinate_y += 1
-            # if step == 'R':
-            #     new_mars_rover_coordinate_x += 1
-            # if step == 'L':
-            #     new_mars_rover_coordinate_x -= 1
-
             new_mars_rover_coordinate_x += step[1]
             new_mars_rover_coordinate_y += step[0]
 
@@ -58,13 +53,15 @@ class draw(Frame):
                             new_mars_rover_coordinate_x * map.size_cell + map.size_cell // 2,
                             new_mars_rover_coordinate_y * map.size_cell + map.size_cell // 2,
                             arrow = 'last',
-                            dash = (5, 2))
+                            dash = (5, 2),
+                            fill = color.color_paths[min(index, len(color.color_paths) - 1)])
 
 
 
             mars_rover_coordinate_x = new_mars_rover_coordinate_x
             mars_rover_coordinate_y = new_mars_rover_coordinate_y
 
+    def draw_start_and_finish (self, map : Map, canvas : Canvas) -> None:
 
         #out start and finish
         canvas.create_text(map.size_cell * map.start_point[1] + map.size_cell // 2, 
@@ -75,6 +72,7 @@ class draw(Frame):
                             map.size_cell * map.finish_point[0] + map.size_cell // 2,
                             text = 'FINISH',
                             justify = 'center')
+
 
     def draw_map (self, map : Map, canvas : Canvas) -> None:
 

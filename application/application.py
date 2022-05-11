@@ -1,13 +1,7 @@
-import json
-import tkinter
 from tkinter import *
-from inspect import getmro
-from json import dump, dumps, load, loads
-from pathlib import PurePath
-from requests import get, post, delete
+from json import loads
+from requests import get, delete
 
-from tkinter.filedialog import askopenfilename, asksaveasfilename
-from tkinter.simpledialog import askstring
 from tkinter.messagebox import askyesno
 
 from application.map import Map
@@ -32,7 +26,7 @@ class Application:
                    activebackground = 'thistle1')
 
         self.button_exit.place(x = 350,
-                y = 650,
+                y = 550,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -62,30 +56,6 @@ class Application:
                 height = 90,
                 width = 300,
                 bordermode='outside')
-
-        # self.button_upload_map = Button(self.master,
-        #            text ="UPLOAD MAP",
-        #            command = self.upload_map,
-        #            bg = 'thistle2',
-        #            activebackground = 'thistle1')
-        #
-        # self.button_upload_map.place(x = 350,
-        #         y = 450,
-        #         height = 90,
-        #         width = 300,
-        #         bordermode='outside')
-
-        # self.button_download_map = Button(self.master,
-        #            text ="DOWNLOAD MAP",
-        #            command = self.download_map,
-        #            bg = 'thistle2',
-        #            activebackground = 'thistle1')
-        #
-        # self.button_download_map.place(x = 350,
-        #         y = 550,
-        #         height = 90,
-        #         width = 300,
-        #         bordermode='outside')
 
         self.button_manage_maps = Button(self.master,
                    text ="MANAGE MAPS",
@@ -124,28 +94,6 @@ class Application:
                                choose_field(fields_list, all_fields,
                                             self.__draw_chosen, slave))
         choose_button.pack()
-
-    def upload_map(self):
-        file_name = askopenfilename()
-        with open(file_name, 'r') as file:
-            field_data = load(file)
-        start = field_data['start']
-        finish = field_data['finish']
-        field = field_data['field']
-
-        form = dumps({'start': start, 'finish': finish,
-                      'field': field, 'name': PurePath(file_name).name})
-        post(url, json=form)
-
-    def download_map(self):
-        all_maps = loads(get(url).content)
-        names = list(all_maps)
-        name = askstring('Choose map', 'map_name.json')
-        if name not in names:
-            return
-        file_name = asksaveasfilename()
-        with open(file_name, 'w') as file:
-            dump(all_maps[name], file)
 
     def manage_maps(self):
         self.master.withdraw()

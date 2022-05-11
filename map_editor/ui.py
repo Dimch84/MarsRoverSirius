@@ -2,7 +2,7 @@ from json import dumps, loads
 from requests import get, post
 from tkinter import BOTH, BOTTOM, Button, Frame, \
     Label, LEFT, Misc, TOP
-from tkinter.messagebox import askokcancel, askyesno, showinfo
+from tkinter.messagebox import askyesno, showinfo
 from tkinter.simpledialog import askinteger, askstring
 
 from constants import url

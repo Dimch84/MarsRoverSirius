@@ -1,11 +1,8 @@
 from tkinter import Misc
 
 from json import loads
-from requests import get, post
-from tkinter import *  # ANCHOR, Button, END, Label, Listbox, Misc, Toplevel
-from tkinter.messagebox import askokcancel, askyesno, showinfo
-from tkinter.simpledialog import askinteger, askstring
-
+from requests import get
+from tkinter import END, Listbox, Toplevel
 from constants import url
 
 

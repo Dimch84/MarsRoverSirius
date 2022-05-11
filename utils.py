@@ -20,7 +20,6 @@ def load_fields_list(master: Misc) -> (Toplevel, Listbox, dict):
     fields_list = Listbox(slave)
 
     all_fields = loads(get(url).content)
-    print(all_fields)
     for name in all_fields:
         description = all_fields[name]['description']
         fields_list.insert(END, f'{name}: {description}')

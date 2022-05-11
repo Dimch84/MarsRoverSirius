@@ -8,7 +8,7 @@ from tkinter.simpledialog import askinteger, askstring
 from constants import url
 from map_editor.square import SquareType, SquareTypeName
 from map_editor.field import Field
-from utils import load_fields, choose_field
+from utils import load_fields_list, choose_field
 
 
 class UI(Frame):
@@ -178,7 +178,7 @@ class UI(Frame):
                              parent=self.master)
         if not confirmed:
             return
-        slave, fields_list, all_fields = load_fields(self.master)
+        slave, fields_list, all_fields = load_fields_list(self.master)
         btn = Button(slave, text="Load",
                      command=lambda:
                      choose_field(fields_list, all_fields,
@@ -231,6 +231,14 @@ class UI(Frame):
             return
         self.__master.destroy()
 
-    def __load_chosen(self, field, slave):
+    def __load_chosen(self, field, slave) -> None:
+        """
+        This method loads the chosen field and deletes the widget with the
+        fields list.
+
+        :param field: chosen field.
+        :param slave: widget with the fields list.
+        :return:
+        """
         self.__field.load_json(dumps(field))
         slave.destroy()

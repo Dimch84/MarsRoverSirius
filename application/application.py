@@ -9,7 +9,7 @@ from application.map_drawing import draw
 
 from constants import url
 from map_editor.editor import Editor
-from utils import load_fields, choose_field
+from utils import load_fields_list, choose_field
 
 
 class Application:
@@ -88,7 +88,7 @@ class Application:
 
         self.master.withdraw()
 
-        slave, fields_list, all_fields = load_fields(self.master)
+        slave, fields_list, all_fields = load_fields_list(self.master)
         choose_button = Button(slave, text="Draw solution",
                                command=lambda:
                                choose_field(fields_list, all_fields,
@@ -97,7 +97,7 @@ class Application:
 
     def manage_maps(self):
         self.master.withdraw()
-        slave, fields_list, all_fields = load_fields(self.master)
+        slave, fields_list, all_fields = load_fields_list(self.master)
         delete_button = Button(slave, text="Delete",
                                command=lambda:
                                choose_field(fields_list, all_fields,

@@ -1,3 +1,5 @@
-heapdict
-Flask
-requests
+heapdict~=1.0.1
+Flask~=2.1.2
+requests~=2.27.1
+SQLAlchemy~=1.4.36
+enum34~=1.1.10

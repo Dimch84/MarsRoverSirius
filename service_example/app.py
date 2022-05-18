@@ -6,13 +6,11 @@ from utils import f
 
 app = Flask(__name__)
 
-fields = {}
-
 
 @app.route('/map/', methods=['GET', 'POST'])
-def process_fields():
+def process_field():
     """
-    This page allows to get the list of all the fields or post a new field.
+    This page allows to get a solution for the posted field.
 
     :return:
     """

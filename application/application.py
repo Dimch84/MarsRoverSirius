@@ -1,69 +1,69 @@
-import tkinter
-from tkinter import *
+from requests import get, delete
 from inspect import getmro
-from json import load
+from json import load, loads
 import os
 
+from tkinter import *
 from tkinter.filedialog import askopenfilename, askopenfilenames
 from tkinter.messagebox import askyesno
-from turtle import width
 
 from application.map import Map
 from application.map_drawing import draw
+
+from constants import url
+from map_editor.editor import Editor
+from utils import load_fields_list, choose_field
 
 from map_editor.editor import Editor
 
 from application.color_application import color
 
-
 FILE_OUT = 'output.json'
 
 class Application:
- 
     def __init__(self, master):
         self.master = master
         self.master.geometry("1000x1000")
         self.master.title('Menu')
         self.master.bind_all('<Destroy>', self.on_destroy)
 
-        self.button_exit = Button(self.master, 
-                   text ="EXIT", 
+        self.button_exit = Button(self.master,
+                   text ="EXIT",
                    command = self.exit,
-                   bg = color.button_background,
-                   activebackground = color.button_a_background)
+                   bg = 'thistle2',
+                   activebackground = 'thistle1')
 
         self.button_exit.place(x = 350,
-                y = 550, 
-                height = 90, 
-                width = 300, 
+                y = 550,
+                height = 90,
+                width = 300,
                 bordermode='outside')
 
 
-        self.button = Button(self.master, 
-                   text ="MAP", 
+        self.button = Button(self.master,
+                   text ="MAP",
                    command = self.draw_map,
-                   bg = color.button_background,
-                   activebackground = color.button_a_background)
+                   bg = 'thistle2',
+                   activebackground = 'thistle1')
 
         self.button.place(x = 350,
-                y = 450, 
-                height = 90, 
-                width = 300, 
+                y = 350,
+                height = 90,
+                width = 300,
                 bordermode='outside')
 
 
-        self.button_make_map = Button(self.master, 
-                   text ="MAKE MAP", 
+        self.button_make_map = Button(self.master,
+                   text ="MAKE MAP",
                    command = self.make_map,
-                   bg = color.button_background,
-                   activebackground = color.button_a_background)
+                   bg = 'thistle2',
+                   activebackground = 'thistle1')
 
         self.button_make_map.place(x = 350,
-                y = 350, 
-                height = 90, 
-                width = 300, 
+                y = 250,
+                height = 90,
+                width = 300,
                 bordermode='outside')
-
 
         self.master.mainloop()
 
@@ -113,7 +113,7 @@ class Application:
 
         for i in range(height):
             for j in range(width):
-                argv += str(field[i][j]) + ' ' 
+                argv += str(field[i][j]) + ' '
 
 
         files_name = askopenfilenames(title = 'Choose a file(s)')
@@ -131,11 +131,33 @@ class Application:
 
             os.system('rm ' + FILE_OUT)
 
-        draw(self.master, Map(len(field), len(field[0]), 
+        draw(self.master, Map(len(field), len(field[0]),
              field, start, goal, direction_paths, radius), files_name)
-		
 
-root = Tk()
-Application (root)
+    # @staticmethod
+    # def __delete_chosen(field, fields_list: Listbox):
+    #     confirmed = askyesno('Delete map',
+    #                          'Are you sure you want '
+    #                          'to delete the chosen map?')
+    #     if not confirmed:
+    #         return
+    #     fields_list.delete(ANCHOR)
+    #     field_name = field['name']
+    #     delete(url + f'/{field_name}')
 
-
+    # def __draw_chosen(self, field, slave):
+    #     def get_direction_path(path: [(int, int)]) -> [(int, int)]:
+    #         direction_path = []
+    #         for i in range(len(path[:-1])):
+    #             current_cell, next_cell = path[i], path[i + 1]
+    #             direction_path.append((next_cell[0] - current_cell[0], next_cell[1] - current_cell[1]))
+    #         return direction_path
+    #
+    #     slave.destroy()
+    #     self.master.withdraw()
+    #     field_name = field['name']
+    #     path_length, path = loads(get(url + f'/{field_name}').content)
+    #     direction_path = get_direction_path(path)
+    #     draw(self.master, Map(len(field['field']), len(field['field'][0]),
+    #          field['field'], field['start'],
+    #          field['finish'], direction_path, -1))

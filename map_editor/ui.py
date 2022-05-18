@@ -1,3 +1,4 @@
+from json import dumps
 from tkinter import BOTH, BOTTOM, Button, Frame, \
     Label, LEFT, Misc, OptionMenu, StringVar, TOP
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -7,9 +8,7 @@ from enum import Enum
 
 from map_editor.square import SquareType, SquareTypeName
 from map_editor.field import Field
-
 from application.color_application import color
-
 
 class FileTypes(Enum):
     JSON = 'JSON'
@@ -233,7 +232,8 @@ class UI(Frame):
         """
         confirmed = askyesno('Randomise',
                              'Are you sure you want to randomise this map '
-                             '(current state of the map will not be saved)?')
+                             '(current state of the map will not be saved)?',
+                             parent=self.master)
         if not confirmed:
             return
         self.__field.generate_random()
@@ -269,3 +269,15 @@ class UI(Frame):
         if not confirmed:
             return
         self.__master.destroy()
+
+    def __load_chosen(self, field, slave) -> None:
+        """
+        This method loads the chosen field and deletes the widget with the
+        fields list.
+
+        :param field: chosen field.
+        :param slave: widget with the fields list.
+        :return:
+        """
+        self.__field.load_json(dumps(field))
+        slave.destroy()

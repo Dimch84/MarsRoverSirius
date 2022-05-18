@@ -34,7 +34,7 @@ class Application:
                    activebackground = 'thistle1')
 
         self.button_exit.place(x = 350,
-                y = 550,
+                y = 450,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -105,16 +105,14 @@ class Application:
         field = field_data['field']
         radius = -1
 
-        argv =  str(height) + ' ' + str(width) + ' '
+        argv = str(height) + ' ' + str(width) + ' '
         argv += str(start[0]) + ' ' + str(start[1]) + ' '
         argv += str(goal[0]) + ' ' + str(goal[1]) + ' '
         argv += str(radius) + ' '
 
-
         for i in range(height):
             for j in range(width):
                 argv += str(field[i][j]) + ' '
-
 
         files_name = askopenfilenames(title = 'Choose a file(s)')
 

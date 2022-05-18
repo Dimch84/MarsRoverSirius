@@ -8,7 +8,7 @@ from constants import url
 
 def load_fields_list(master: Misc) -> (Toplevel, Listbox, dict):
     """
-    This method loads a fields list from service.
+    This method loads a fields list from service_example.
 
     :param master: master tkinter widget.
     :return: slave widget, listbox with all the fields,

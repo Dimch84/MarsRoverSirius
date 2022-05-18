@@ -5,7 +5,7 @@ from map_editor.square import SquareType, SquareTypeName, SquareTypeColor
 from application.color_application import color
 
 class draw(Frame):
- 
+
     def __init__(self, master, map : Map, files_name):
         self.slave = Toplevel(master)
         self.slave.title('Map drawing')
@@ -32,7 +32,7 @@ class draw(Frame):
             self.animation_with_dawn (map, canvas)
 
     def draw_path (self, map : Map, canvas : Canvas, index : int) -> None:
-        
+
         # drawing movement Mars rover
         mars_rover_coordinate_y = map.start_point[0]
         mars_rover_coordinate_x = map.start_point[1]
@@ -40,7 +40,7 @@ class draw(Frame):
 
             new_mars_rover_coordinate_y = mars_rover_coordinate_y
             new_mars_rover_coordinate_x = mars_rover_coordinate_x
-            
+
             new_mars_rover_coordinate_x += step[1]
             new_mars_rover_coordinate_y += step[0]
 
@@ -134,7 +134,7 @@ class draw(Frame):
 
         # black_zone
         black_lines = []
-        
+
         for x in range (-map.m, 2 * map.m):
             for y in range (-map.n, 2 * map.n):
                 if abs(x - map.start_point[1]) + abs(y - map.start_point[0]) > map.radius:

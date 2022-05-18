@@ -2,7 +2,7 @@ from enum import IntEnum
 from pydoc import plain
 from tkinter import Canvas
 
-from code.color_application import color
+from application.color_application import color
 
 class SquareType(IntEnum):
     PLAIN = 0

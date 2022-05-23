@@ -17,6 +17,7 @@ from code.color_application import color
 
 
 FILE_OUT = 'output.json'
+radius = -1
 
 class Application:
  
@@ -64,6 +65,21 @@ class Application:
                 width = 300, 
                 bordermode='outside')
 
+        def get_radius():
+            global radius
+            radius = int(message.get())
+
+        message = StringVar()
+        message_entry = Entry(textvariable = message)
+        message_entry.place (x = 900, y = 950, anchor = CENTER)
+
+        message_button = Button(
+                                text = "Save radius", 
+                                command = get_radius,
+                                bg = color.button_background,
+                                activebackground = color.button_a_background)
+        message_button.place(x = 900, y = 980, anchor = CENTER)
+
 
         self.master.mainloop()
 
@@ -78,7 +94,6 @@ class Application:
             return
 
         exit()
-        #self.master.quit()
 
     def make_map(self):
         self.master.withdraw()
@@ -92,8 +107,6 @@ class Application:
                 string_array.append(''.join(map(str,subarray)))
             return string_array
 
-
-        # self.master.withdraw()
         file_name = askopenfilename(title = 'Choose a file map')
 
         with open(file_name, 'r') as file:
@@ -103,7 +116,6 @@ class Application:
         start = field_data['start']
         goal = field_data['finish']
         field = field_data['field']
-        radius = -1
 
         argv =  str(height) + ' ' + str(width) + ' '
         argv += str(start[0]) + ' ' + str(start[1]) + ' '
@@ -131,6 +143,8 @@ class Application:
 
             os.system('rm ' + FILE_OUT)
 
+
+        self.master.withdraw()
         draw(self.master, Map(len(field), len(field[0]), 
              field, start, goal, direction_paths, radius), files_name)
 		

@@ -3,7 +3,6 @@ from tkinter import *
 from code.map import Map
 from map_editor.square import SquareType, SquareTypeName, SquareTypeColor
 from code.color_application import color
-from tkinter.filedialog import askopenfilename, askopenfilenames
 
 MINIMUM_CELL_SIZE_FOR_IMAGE = 50
 
@@ -93,10 +92,10 @@ class draw(Frame):
         img_rover = PhotoImage(file = "images/mars_rover.png")
         rover = canvas.create_image(
                                         map.start_point[1] * map.size_cell + 
-                                        map.size_cell // 4,
+                                        map.size_cell // 2,
                                         map.start_point[0] * map.size_cell + 
-                                        map.size_cell // 4, 
-                                        anchor = NW, 
+                                        map.size_cell // 2, 
+                                        anchor = CENTER, 
                                         image = img_rover)
         
         if map.size_cell < MINIMUM_CELL_SIZE_FOR_IMAGE:
@@ -136,10 +135,10 @@ class draw(Frame):
         img_rover = PhotoImage(file = "images/mars_rover.png")
         rover = canvas.create_image(
                                         map.start_point[1] * map.size_cell + 
-                                        map.size_cell // 4,
+                                        map.size_cell // 2,
                                         map.start_point[0] * map.size_cell + 
-                                        map.size_cell // 4, 
-                                        anchor = NW, 
+                                        map.size_cell // 2, 
+                                        anchor = CENTER, 
                                         image = img_rover)
         
         if map.size_cell < MINIMUM_CELL_SIZE_FOR_IMAGE:

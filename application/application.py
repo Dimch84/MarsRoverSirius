@@ -1,40 +1,27 @@
 from requests import delete, get, post
-from json import dumps, load, loads
+from json import dumps, loads
 
-from tkinter import *
-from tkinter.filedialog import askopenfilename, askopenfilenames
-from tkinter.messagebox import askyesno, showinfo
+from tkinter import Button, CENTER, Entry, Event, StringVar
+from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
+
+from json import load
+
+from tkinter.filedialog import askopenfilename, askopenfilenames
+from tkinter.messagebox import askyesno
 
 from application.map import Map
 from application.map_drawing import draw
+from application.color_application import color
 
 from constants import url
 
 from map_editor.editor import Editor
 
-from application.map import Map
-from application.map_drawing import draw
-import tkinter
-from tkinter import *
-from inspect import getmro
-from json import load
-import os
-
-from tkinter.filedialog import askopenfilename, askopenfilenames
-from tkinter.messagebox import askyesno
-from turtle import width
-
-from application.map import Map
-from application.map_drawing import draw
-
-from map_editor.editor import Editor
-
-from application.color_application import color
-
 
 FILE_OUT = 'output.json'
 radius = -1
+
 
 class Application:
 

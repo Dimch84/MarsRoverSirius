@@ -1,6 +1,7 @@
 from flask import Flask, request
 from json import dumps, loads
-from src.a_star import A_star
+from src.lifelong_a_star import Lifelong_a_star
+from src.launch_a_star import get_direction_path
 
 from utils import f
 
@@ -16,4 +17,6 @@ def process_field():
     """
     if request.method == 'POST':
         field = loads(request.json)
-        return dumps(A_star.call(field['start'], field['finish'], f(field['field'])))
+        answer = Lifelong_a_star.call(field['start'], field['finish'], f(field['field']))
+        answer = (answer[0], get_direction_path(answer[1]))
+        return dumps(answer)

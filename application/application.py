@@ -1,11 +1,12 @@
-from requests import get, delete
+from requests import get, post
 from inspect import getmro
-from json import load, loads
+from json import dumps, load, loads
 import os
 
 from tkinter import *
 from tkinter.filedialog import askopenfilename, askopenfilenames
 from tkinter.messagebox import askyesno
+from tkinter.simpledialog import askstring
 
 from application.map import Map
 from application.map_drawing import draw
@@ -34,7 +35,7 @@ class Application:
                    activebackground = 'thistle1')
 
         self.button_exit.place(x = 350,
-                y = 450,
+                y = 550,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -61,6 +62,19 @@ class Application:
 
         self.button_make_map.place(x = 350,
                 y = 250,
+                height = 90,
+                width = 300,
+                bordermode='outside')
+
+
+        self.button_register = Button(self.master,
+                    text ="REGISTER",
+                    command = self.register,
+                    bg = 'thistle2',
+                    activebackground = 'thistle1')
+
+        self.button_register.place(x = 350,
+                y = 450,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -105,33 +119,51 @@ class Application:
         field = field_data['field']
         radius = -1
 
-        argv = str(height) + ' ' + str(width) + ' '
-        argv += str(start[0]) + ' ' + str(start[1]) + ' '
-        argv += str(goal[0]) + ' ' + str(goal[1]) + ' '
-        argv += str(radius) + ' '
-
-        for i in range(height):
-            for j in range(width):
-                argv += str(field[i][j]) + ' '
+        # argv = str(height) + ' ' + str(width) + ' '
+        # argv += str(start[0]) + ' ' + str(start[1]) + ' '
+        # argv += str(goal[0]) + ' ' + str(goal[1]) + ' '
+        # argv += str(radius) + ' '
+        #
+        # for i in range(height):
+        #     for j in range(width):
+        #         argv += str(field[i][j]) + ' '
 
         files_name = askopenfilenames(title = 'Choose a file(s)')
 
+        # direction_paths = []
+        #
+        # for file_name in files_name:
+        #
+        #     os.system('touch ' + FILE_OUT)
+        #     os.system('python3 ' + file_name + ' ' + FILE_OUT + ' ' + argv)
+        #
+        #     with open(FILE_OUT, 'r') as file:
+        #         field_data = load(file)
+        #     direction_paths.append(field_data['path'])
+        #
+        #     os.system('rm ' + FILE_OUT)
+
         direction_paths = []
-
-        for file_name in files_name:
-
-            os.system('touch ' + FILE_OUT)
-            os.system('python3 ' + file_name + ' ' + FILE_OUT + ' ' + argv)
-
-            with open(FILE_OUT, 'r') as file:
-                field_data = load(file)
-            direction_paths.append(field_data['path'])
-
-            os.system('rm ' + FILE_OUT)
+        teams = loads(get(url).content)
+        for team in teams:
+            answer = loads(post(team['url'], json=dumps(field_data)).content)
+            print(answer[1])
+            direction_paths.append(answer[1])
 
         draw(self.master, Map(len(field), len(field[0]),
              field, start, goal, direction_paths, radius), files_name)
 
+    @staticmethod
+    def register(self):
+        team_name = askstring('Team name',
+                              'Enter your team\'s name:')
+        if not team_name:
+            return
+        team_url = askstring('Service url',
+                             'Enter your service\'s url:')
+        if not team_url:
+            return
+        post(url, json=dumps({'name': team_name, 'url': team_url}))
     # @staticmethod
     # def __delete_chosen(field, fields_list: Listbox):
     #     confirmed = askyesno('Delete map',

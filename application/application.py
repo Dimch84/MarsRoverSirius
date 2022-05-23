@@ -1,7 +1,5 @@
 from requests import get, post
-from inspect import getmro
 from json import dumps, load, loads
-import os
 
 from tkinter import *
 from tkinter.filedialog import askopenfilename, askopenfilenames
@@ -12,12 +10,9 @@ from application.map import Map
 from application.map_drawing import draw
 
 from constants import url
-from map_editor.editor import Editor
-from utils import load_fields_list, choose_field
 
 from map_editor.editor import Editor
 
-from application.color_application import color
 
 FILE_OUT = 'output.json'
 
@@ -119,36 +114,16 @@ class Application:
         field = field_data['field']
         radius = -1
 
-        # argv = str(height) + ' ' + str(width) + ' '
-        # argv += str(start[0]) + ' ' + str(start[1]) + ' '
-        # argv += str(goal[0]) + ' ' + str(goal[1]) + ' '
-        # argv += str(radius) + ' '
-        #
-        # for i in range(height):
-        #     for j in range(width):
-        #         argv += str(field[i][j]) + ' '
-
         files_name = askopenfilenames(title = 'Choose a file(s)')
-
-        # direction_paths = []
-        #
-        # for file_name in files_name:
-        #
-        #     os.system('touch ' + FILE_OUT)
-        #     os.system('python3 ' + file_name + ' ' + FILE_OUT + ' ' + argv)
-        #
-        #     with open(FILE_OUT, 'r') as file:
-        #         field_data = load(file)
-        #     direction_paths.append(field_data['path'])
-        #
-        #     os.system('rm ' + FILE_OUT)
 
         direction_paths = []
         teams = loads(get(url).content)
         for team in teams:
-            answer = loads(post(team['url'], json=dumps(field_data)).content)
-            print(answer[1])
-            direction_paths.append(answer[1])
+            try:
+                answer = loads(post(team['url'], json=dumps(field_data)).content)
+                direction_paths.append(answer[1])
+            except EXCEPTION:
+                print('Connection error')
 
         draw(self.master, Map(len(field), len(field[0]),
              field, start, goal, direction_paths, radius), files_name)
@@ -164,30 +139,3 @@ class Application:
         if not team_url:
             return
         post(url, json=dumps({'name': team_name, 'url': team_url}))
-    # @staticmethod
-    # def __delete_chosen(field, fields_list: Listbox):
-    #     confirmed = askyesno('Delete map',
-    #                          'Are you sure you want '
-    #                          'to delete the chosen map?')
-    #     if not confirmed:
-    #         return
-    #     fields_list.delete(ANCHOR)
-    #     field_name = field['name']
-    #     delete(url + f'/{field_name}')
-
-    # def __draw_chosen(self, field, slave):
-    #     def get_direction_path(path: [(int, int)]) -> [(int, int)]:
-    #         direction_path = []
-    #         for i in range(len(path[:-1])):
-    #             current_cell, next_cell = path[i], path[i + 1]
-    #             direction_path.append((next_cell[0] - current_cell[0], next_cell[1] - current_cell[1]))
-    #         return direction_path
-    #
-    #     slave.destroy()
-    #     self.master.withdraw()
-    #     field_name = field['name']
-    #     path_length, path = loads(get(url + f'/{field_name}').content)
-    #     direction_path = get_direction_path(path)
-    #     draw(self.master, Map(len(field['field']), len(field['field'][0]),
-    #          field['field'], field['start'],
-    #          field['finish'], direction_path, -1))

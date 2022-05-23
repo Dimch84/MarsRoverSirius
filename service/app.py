@@ -36,7 +36,7 @@ def process_services():
 
 
 @app.route('/services/<service_name>', methods=['GET', 'DELETE'])
-def get_solution(service_name):
+def get_service(service_name):
     """
     This page allows to get the url of the chosen service or delete it.
 

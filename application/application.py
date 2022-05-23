@@ -1,4 +1,4 @@
-from requests import get, post
+from requests import delete, get, post
 from json import dumps, load, loads
 
 from tkinter import *
@@ -43,7 +43,7 @@ class Application:
                    activebackground = 'thistle1')
 
         self.button.place(x = 350,
-                y = 350,
+                y = 250,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -56,7 +56,7 @@ class Application:
                    activebackground = 'thistle1')
 
         self.button_make_map.place(x = 350,
-                y = 250,
+                y = 150,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -69,9 +69,22 @@ class Application:
                     activebackground = 'thistle1')
 
         self.button_register.place(x = 350,
-                y = 450,
+                y = 350,
                 height = 90,
                 width = 300,
+                bordermode='outside')
+
+
+        self.button_delete = Button(self.master,
+                    text="DELETE",
+                    command=self.delete,
+                    bg='thistle2',
+                    activebackground='thistle1')
+
+        self.button_delete.place(x=350,
+                y=450,
+                height=90,
+                width=300,
                 bordermode='outside')
 
         self.master.mainloop()
@@ -129,7 +142,7 @@ class Application:
              field, start, goal, direction_paths, radius), files_name)
 
     @staticmethod
-    def register(self):
+    def register():
         team_name = askstring('Team name',
                               'Enter your team\'s name:')
         if not team_name:
@@ -139,3 +152,11 @@ class Application:
         if not team_url:
             return
         post(url, json=dumps({'name': team_name, 'url': team_url}))
+
+    @staticmethod
+    def delete():
+        team_name = askstring('Team name',
+                              'Enter your team\'s name:')
+        if not team_name:
+            return
+        delete(url + team_name)

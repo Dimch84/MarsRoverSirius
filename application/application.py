@@ -64,7 +64,7 @@ class Application:
                    activebackground = color.button_a_background)
 
         self.button.place(x = 350,
-                y = 450,
+                y = 250,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -77,7 +77,7 @@ class Application:
                    activebackground = color.button_a_background)
 
         self.button_make_map.place(x = 350,
-                y = 350,
+                y = 150,
                 height = 90,
                 width = 300,
                 bordermode='outside')

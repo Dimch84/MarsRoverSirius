@@ -4,8 +4,10 @@ from application.map import Map
 from map_editor.square import SquareType, SquareTypeName, SquareTypeColor
 from application.color_application import color
 
-class draw(Frame):
+MINIMUM_CELL_SIZE_FOR_IMAGE = 50
 
+class draw(Frame):
+ 
     def __init__(self, master, map : Map, files_name):
         self.slave = Toplevel(master)
         self.slave.title('Map drawing')
@@ -32,7 +34,7 @@ class draw(Frame):
             self.animation_with_dawn (map, canvas)
 
     def draw_path (self, map : Map, canvas : Canvas, index : int) -> None:
-
+        
         # drawing movement Mars rover
         mars_rover_coordinate_y = map.start_point[0]
         mars_rover_coordinate_x = map.start_point[1]
@@ -40,7 +42,7 @@ class draw(Frame):
 
             new_mars_rover_coordinate_y = mars_rover_coordinate_y
             new_mars_rover_coordinate_x = mars_rover_coordinate_x
-
+            
             new_mars_rover_coordinate_x += step[1]
             new_mars_rover_coordinate_y += step[0]
 
@@ -87,17 +89,27 @@ class draw(Frame):
         
         mars_rover_coordinate_y = mars_rover_coordinate_x = 1
 
-        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
-                                        map.size_cell // 4, 
+        img_rover = PhotoImage(file = "images/mars_rover.png")
+        rover = canvas.create_image(
+                                        map.start_point[1] * map.size_cell + 
+                                        map.size_cell // 2,
                                         map.start_point[0] * map.size_cell + 
-                                        map.size_cell // 4,
-                                        (map.start_point[1] + 1) * map.size_cell - 
-                                        map.size_cell // 4,
-                                        (map.start_point[0] + 1) * map.size_cell -
-                                        map.size_cell // 4,
-                                        outline = 'black', 
-                                        fill = 'black', 
-                                        width = 1)
+                                        map.size_cell // 2, 
+                                        anchor = CENTER, 
+                                        image = img_rover)
+        
+        if map.size_cell < MINIMUM_CELL_SIZE_FOR_IMAGE:
+            rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
+                                            map.size_cell // 4, 
+                                            map.start_point[0] * map.size_cell + 
+                                            map.size_cell // 4,
+                                            (map.start_point[1] + 1) * map.size_cell - 
+                                            map.size_cell // 4,
+                                            (map.start_point[0] + 1) * map.size_cell -
+                                            map.size_cell // 4,
+                                            outline = 'black', 
+                                            fill = 'black', 
+                                            width = 1)
 
         
 
@@ -119,25 +131,35 @@ class draw(Frame):
         
         mars_rover_coordinate_y = mars_rover_coordinate_x = 1
 
-        rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
-                                        map.size_cell // 4, 
-                                        map.start_point[0] * map.size_cell + 
-                                        map.size_cell // 4,
-                                        (map.start_point[1] + 1) * map.size_cell - 
-                                        map.size_cell // 4,
-                                        (map.start_point[0] + 1) * map.size_cell -
-                                        map.size_cell // 4,
-                                        outline = 'black', 
-                                        fill = 'black', 
-                                        width = 1)
 
+        img_rover = PhotoImage(file = "images/mars_rover.png")
+        rover = canvas.create_image(
+                                        map.start_point[1] * map.size_cell + 
+                                        map.size_cell // 2,
+                                        map.start_point[0] * map.size_cell + 
+                                        map.size_cell // 2, 
+                                        anchor = CENTER, 
+                                        image = img_rover)
+        
+        if map.size_cell < MINIMUM_CELL_SIZE_FOR_IMAGE:
+            rover = canvas.create_rectangle(map.start_point[1] * map.size_cell + 
+                                            map.size_cell // 4, 
+                                            map.start_point[0] * map.size_cell + 
+                                            map.size_cell // 4,
+                                            (map.start_point[1] + 1) * map.size_cell - 
+                                            map.size_cell // 4,
+                                            (map.start_point[0] + 1) * map.size_cell -
+                                            map.size_cell // 4,
+                                            outline = 'black', 
+                                            fill = 'black', 
+                                            width = 1)
 
         # black_zone
         black_lines = []
-
+        
         for x in range (-map.m, 2 * map.m):
             for y in range (-map.n, 2 * map.n):
-                if abs(x - map.start_point[1]) + abs(y - map.start_point[0]) > map.radius:
+                if max(abs(x - map.start_point[1]), abs(y - map.start_point[0])) > map.radius:
                     black_lines.append(
                         canvas.create_rectangle(
                                 x * map.size_cell,

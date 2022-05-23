@@ -13,10 +13,31 @@ from constants import url
 
 from map_editor.editor import Editor
 
+from application.map import Map
+from application.map_drawing import draw
+import tkinter
+from tkinter import *
+from inspect import getmro
+from json import load
+import os
+
+from tkinter.filedialog import askopenfilename, askopenfilenames
+from tkinter.messagebox import askyesno
+from turtle import width
+
+from application.map import Map
+from application.map_drawing import draw
+
+from map_editor.editor import Editor
+
+from application.color_application import color
+
 
 FILE_OUT = 'output.json'
+radius = -1
 
 class Application:
+
     def __init__(self, master):
         self.master = master
         self.master.geometry("1000x1000")
@@ -26,8 +47,8 @@ class Application:
         self.button_exit = Button(self.master,
                    text ="EXIT",
                    command = self.exit,
-                   bg = 'thistle2',
-                   activebackground = 'thistle1')
+                   bg = color.button_background,
+                   activebackground = color.button_a_background)
 
         self.button_exit.place(x = 350,
                 y = 550,
@@ -39,11 +60,11 @@ class Application:
         self.button = Button(self.master,
                    text ="MAP",
                    command = self.draw_map,
-                   bg = 'thistle2',
-                   activebackground = 'thistle1')
+                   bg = color.button_background,
+                   activebackground = color.button_a_background)
 
         self.button.place(x = 350,
-                y = 250,
+                y = 450,
                 height = 90,
                 width = 300,
                 bordermode='outside')
@@ -52,21 +73,20 @@ class Application:
         self.button_make_map = Button(self.master,
                    text ="MAKE MAP",
                    command = self.make_map,
-                   bg = 'thistle2',
-                   activebackground = 'thistle1')
+                   bg = color.button_background,
+                   activebackground = color.button_a_background)
 
         self.button_make_map.place(x = 350,
-                y = 150,
+                y = 350,
                 height = 90,
                 width = 300,
                 bordermode='outside')
 
-
         self.button_register = Button(self.master,
                     text ="REGISTER",
                     command = self.register,
-                    bg = 'thistle2',
-                    activebackground = 'thistle1')
+                    bg = color.button_background,
+                    activebackground = color.button_a_background)
 
         self.button_register.place(x = 350,
                 y = 350,
@@ -78,14 +98,30 @@ class Application:
         self.button_delete = Button(self.master,
                     text="DELETE",
                     command=self.delete,
-                    bg='thistle2',
-                    activebackground='thistle1')
+                    bg=color.button_background,
+                    activebackground=color.button_a_background)
 
         self.button_delete.place(x=350,
                 y=450,
                 height=90,
                 width=300,
                 bordermode='outside')
+
+        def get_radius():
+            global radius
+            radius = int(message.get())
+
+        message = StringVar()
+        message_entry = Entry(textvariable = message)
+        message_entry.place (x = 900, y = 950, anchor = CENTER)
+
+        message_button = Button(
+                                text = "Save radius",
+                                command = get_radius,
+                                bg = color.button_background,
+                                activebackground = color.button_a_background)
+        message_button.place(x = 900, y = 980, anchor = CENTER)
+
 
         self.master.mainloop()
 
@@ -100,7 +136,6 @@ class Application:
             return
 
         exit()
-        #self.master.quit()
 
     def make_map(self):
         self.master.withdraw()
@@ -114,8 +149,6 @@ class Application:
                 string_array.append(''.join(map(str,subarray)))
             return string_array
 
-
-        # self.master.withdraw()
         file_name = askopenfilename(title = 'Choose a file map')
 
         with open(file_name, 'r') as file:

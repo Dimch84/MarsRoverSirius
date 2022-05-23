@@ -2,21 +2,21 @@
 class color:
 
     #button
-    button_background = 'thistle2'
-    button_a_background = 'thistle1'
+    button_background = '#F7CBBA'
+    button_a_background = '#FD9E7A'
 
 
     #cell
-    plain = '#D6FA3F'
-    mountain = '#BFB430'
-    sand = '#FFF040'
-    crater = '#FFD140'
-    start = '#9DB82E'
-    finish = '#819F00'
+    plain = '#FD9E7A'
+    mountain = '#BA3E11'
+    sand = '#FDCA7A'
+    crater = '#CC643E'
+    start = '#9D0E4D'
+    finish = '#AD3469'
 
     #paths
     color_paths = [
-        '#440A45',
+        'black',
         '#2A056B',
         '#06697A',
         '#078A4A'

@@ -1,8 +1,8 @@
 from tkinter import *
 
-from code.map import Map
+from application.map import Map
 from map_editor.square import SquareType, SquareTypeName, SquareTypeColor
-from code.color_application import color
+from application.color_application import color
 
 MINIMUM_CELL_SIZE_FOR_IMAGE = 50
 

@@ -1,6 +1,6 @@
 from tkinter import Tk
 
-from code.application import Application
+from application.application import Application
 
 
 def main():

@@ -8,12 +8,12 @@ from tkinter.filedialog import askopenfilename, askopenfilenames
 from tkinter.messagebox import askyesno
 from turtle import width
 
-from code.map import Map
-from code.map_drawing import draw
+from application.map import Map
+from application.map_drawing import draw
 
 from map_editor.editor import Editor
 
-from code.color_application import color
+from application.color_application import color
 
 
 FILE_OUT = 'output.json'

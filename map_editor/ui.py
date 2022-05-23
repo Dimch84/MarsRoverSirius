@@ -8,7 +8,7 @@ from enum import Enum
 from map_editor.square import SquareType, SquareTypeName
 from map_editor.field import Field
 
-from code.color_application import color
+from application.color_application import color
 
 
 class FileTypes(Enum):

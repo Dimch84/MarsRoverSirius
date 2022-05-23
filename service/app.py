@@ -1,4 +1,5 @@
 from flask import Flask, request
+from hashlib import sha256
 from json import dumps, loads
 from sqlalchemy.orm import Session
 from sqlalchemy import delete, select
@@ -19,14 +20,23 @@ def process_services():
     if request.method == 'POST':
         service_data = loads(request.json)
         service_name = service_data['name']
+        service_password = sha256(str.encode(
+            service_data['password'])).hexdigest()
         service_url = service_data['url']
-        service = Service(name=service_name, url=service_url)
-        session.execute(delete(Service).where(Service.name == service.name))
-        session.add(service)
+        new_service = Service(name=service_name,
+                              password=service_password, url=service_url)
+        service = session.execute(select(Service).
+                                  where(Service.name == service_name)).scalar()
+        if service and service.password != service_password:
+            session.close()
+            return dumps({'answer': 'Incorrect password'})
+        session.execute(delete(Service).where(
+            Service.name == new_service.name))
+        session.add(new_service)
         session.flush()
         session.commit()
         session.close()
-        return 'OK'
+        return dumps({'answer': 'OK'})
     if request.method == 'GET':
         services = session.execute(select(Service)).all()
         services = list(map(lambda x: x[0], services))
@@ -45,16 +55,23 @@ def get_service(service_name):
     """
     session = Session(engine)
     if request.method == 'DELETE':
-        print(service_name)
+        password = sha256(str.encode(
+            loads(request.json)['password'])).hexdigest()
+        service = session.execute(select(Service).
+                                  where(Service.name == service_name)). \
+            scalar()
+        if service and service.password != password:
+            session.close()
+            return dumps({'answer': 'Incorrect password'})
         session.execute(delete(Service).where(Service.name == service_name))
         session.flush()
         session.commit()
         session.close()
-        return 'OK'
+        return dumps({'answer': 'OK'})
     if request.method == 'GET':
         service = session.execute(select(Service).
                                   where(Service.name == service_name)).scalar()
         session.close()
         if service is None:
-            return 'Unknown service name'
+            return dumps({'answer': 'Unknown service name'})
         return dumps({'name': service.name, 'url': service.url})

@@ -9,6 +9,7 @@ class Service(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(30))
+    password = Column(String)
     url = Column(String)
 
     def __repr__(self):

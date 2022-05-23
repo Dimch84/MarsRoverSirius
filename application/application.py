@@ -3,7 +3,7 @@ from json import dumps, load, loads
 
 from tkinter import *
 from tkinter.filedialog import askopenfilename, askopenfilenames
-from tkinter.messagebox import askyesno
+from tkinter.messagebox import askyesno, showinfo
 from tkinter.simpledialog import askstring
 
 from application.map import Map
@@ -135,7 +135,7 @@ class Application:
             try:
                 answer = loads(post(team['url'], json=dumps(field_data)).content)
                 direction_paths.append(answer[1])
-            except EXCEPTION:
+            except BaseException:
                 print('Connection error')
 
         draw(self.master, Map(len(field), len(field[0]),
@@ -151,7 +151,13 @@ class Application:
                              'Enter your service\'s url:')
         if not team_url:
             return
-        post(url, json=dumps({'name': team_name, 'url': team_url}))
+        team_password = askstring('Password',
+                                  'Enter your team\'s password:')
+        result = post(url, json=dumps({'name': team_name,
+                                       'password': team_password,
+                                       'url': team_url}))
+        showinfo('Result',
+                 loads(result.content)['answer'])
 
     @staticmethod
     def delete():
@@ -159,4 +165,11 @@ class Application:
                               'Enter your team\'s name:')
         if not team_name:
             return
-        delete(url + team_name)
+        team_password = askstring('Password',
+                                  'Enter your team\'s password:')
+        if not team_password:
+            return
+        result = delete(url + team_name,
+                        json=dumps({'password': team_password}))
+        showinfo('Result',
+                 loads(result.content)['answer'])

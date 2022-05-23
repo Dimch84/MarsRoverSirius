@@ -147,19 +147,19 @@ class Application:
         field = field_data['field']
         radius = -1
 
-        files_name = askopenfilenames(title = 'Choose a file(s)')
-
         direction_paths = []
+        names = []
         teams = loads(get(url).content)
         for team in teams:
             try:
                 answer = loads(post(team['url'], json=dumps(field_data)).content)
                 direction_paths.append(answer[1])
+                names.append(team['name'])
             except BaseException:
                 print('Connection error')
 
         draw(self.master, Map(len(field), len(field[0]),
-             field, start, goal, direction_paths, radius), files_name)
+             field, start, goal, direction_paths, radius), names)
 
     @staticmethod
     def register():

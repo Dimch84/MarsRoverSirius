@@ -207,5 +207,5 @@ class draw(Frame):
 
             canvas.create_text(
                             map.width + 200, y,
-                            text = files_name[i].split('/')[-1],
+                            text = files_name[i],
                             justify = 'center')

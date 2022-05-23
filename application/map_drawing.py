@@ -4,7 +4,7 @@ from application.map import Map
 from map_editor.square import SquareType, SquareTypeName, SquareTypeColor
 from application.color_application import color
 
-MINIMUM_CELL_SIZE_FOR_IMAGE = 50
+MINIMUM_CELL_SIZE_FOR_IMAGE = 5
 
 class draw(Frame):
  
